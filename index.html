@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cashier Counting System</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f2f3f5;
+    margin: 0;
+    padding: 24px;
+    color: #222;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .wrap {
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .card {
+    background: #fff;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .card h2 {
+    font-size: 17px;
+    margin: 0 0 4px;
+  }
+  .card .sub {
+    font-size: 12px;
+    color: #777;
+    margin: 0 0 14px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    font-size: 12px;
+    color: #777;
+    font-weight: normal;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #eee;
+  }
+  th:last-child, td:last-child { text-align: right; }
+  td { padding: 6px 0; vertical-align: middle; }
+  input[type=number] {
+    width: 90px;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  .totalRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid #ddd;
+    font-weight: bold;
+  }
+  .totalRow span:last-child { font-size: 18px; }
+  .infoRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 8px;
+    font-size: 13px;
+  }
+  .infoRow.good { color: #1a7f37; }
+  .infoRow.warn { color: #b35c00; }
+  button {
+    margin-top: 14px;
+    width: 100%;
+    padding: 10px;
+    background: #2f6fed;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  button:hover { background: #255bc4; }
+  button.secondary {
+    background: #fff;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+  button.secondary:hover { background: #f5f5f5; }
+  .comboBox {
+    margin-top: 14px;
+    display: none;
+  }
+  .comboBox.show { display: block; }
+  .comboOption {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .comboOption.selected {
+    border-color: #2f6fed;
+    background: #eaf0fe;
+  }
+  .comboOption span:last-child { color: #777; font-size: 12px; }
+  .hidden { display: none; }
+  .movedList {
+    background: #f7f7f8;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .movedList .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2px 0;
+  }
+  .movedList .row.total {
+    border-top: 1px solid #ddd;
+    margin-top: 6px;
+    padding-top: 6px;
+    font-weight: bold;
+  }
+  .muted { color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Cashier Counting System</h1>
+
+  <!-- ============ FLOAT FORM ============ -->
+  <div class="card">
+    <h2>Float</h2>
+    <p class="sub">Target float: RM200.00</p>
+
+    <table>
+      <tr><th>Coin</th><th>Pieces</th><th>Subtotal</th></tr>
+      <tr>
+        <td>RM0.05</td>
+        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.05" id="coin_5"></td>
+        <td class="subtotal" id="sub_5">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM0.10</td>
+        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.10" id="coin_10"></td>
+        <td class="subtotal" id="sub_10">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM0.20</td>
+        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.20" id="coin_20"></td>
+        <td class="subtotal" id="sub_20">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM0.50</td>
+        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.50" id="coin_50"></td>
+        <td class="subtotal" id="sub_50">RM0.00</td>
+      </tr>
+    </table>
+
+    <div class="totalRow">
+      <span>Coins total</span>
+      <span id="coinsTotal">RM0.00</span>
+    </div>
+
+    <button id="confirmCoinsBtn" onclick="confirmCoins()">Confirm coins</button>
+
+    <div class="comboBox" id="comboBox">
+      <p class="sub" style="margin-top:14px;">Remainder <span id="remainderLabel">RM0.00</span> — choose the coins to move to Sale</p>
+      <div id="comboList"></div>
+      <button onclick="confirmComboSelection()">Confirm deduction</button>
+    </div>
+
+    <div id="notesSection" class="hidden">
+      <table style="margin-top:18px;">
+        <tr><th>Note</th><th>Pieces</th><th>Subtotal</th></tr>
+        <tr>
+          <td>RM1</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="1" id="note_1"></td>
+          <td class="subtotal" id="subnote_1">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM5</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="5" id="note_5"></td>
+          <td class="subtotal" id="subnote_5">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM10</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="10" id="note_10"></td>
+          <td class="subtotal" id="subnote_10">RM0.00</td>
+        </tr>
+      </table>
+
+      <div class="infoRow">
+        <span>Notes total</span>
+        <span id="notesTotal">RM0.00</span>
+      </div>
+      <div class="infoRow" id="remainingRow">
+        <span>Remaining to RM200</span>
+        <span id="remainingToTarget">RM154.00</span>
+      </div>
+      <div class="totalRow">
+        <span>Float total</span>
+        <span id="floatGrandTotal">RM0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SALE FORM ============ -->
+  <div class="card">
+    <h2>Sale</h2>
+    <p class="sub">No target — totals whatever is counted</p>
+
+    <div class="movedList" id="movedCoinsList">
+      <p class="muted" style="margin:0;">No coins moved from float yet</p>
+    </div>
+
+    <table>
+      <tr><th>Note</th><th>Pieces</th><th>Subtotal</th></tr>
+      <tr>
+        <td>RM1</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="1" id="salenote_1"></td>
+        <td class="subtotal" id="subsalenote_1">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM5</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="5" id="salenote_5"></td>
+        <td class="subtotal" id="subsalenote_5">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM10</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="10" id="salenote_10"></td>
+        <td class="subtotal" id="subsalenote_10">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM50</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="50" id="salenote_50"></td>
+        <td class="subtotal" id="subsalenote_50">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM100</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="100" id="salenote_100"></td>
+        <td class="subtotal" id="subsalenote_100">RM0.00</td>
+      </tr>
+    </table>
+
+    <div class="totalRow">
+      <span>Sales total</span>
+      <span id="salesGrandTotal">RM0.00</span>
+    </div>
+  </div>
+
+  <button class="secondary" onclick="resetAll()">Reset all</button>
+</div>
+
+<script>
+// ---------- helpers ----------
+function fmt(n) {
+  return "RM" + (Math.round(n * 100) / 100).toFixed(2);
+}
+function toCents(n) {
+  return Math.round(n * 100);
+}
+
+// ---------- state ----------
+const COIN_DENOMS = [0.05, 0.10, 0.20, 0.50];
+let movedCoins = {}; // e.g. {0.20: 1, 0.10: 1, 0.05: 1}
+let selectedComboIndex = -1;
+let currentCombos = [];
+
+// ---------- FLOAT: coins ----------
+function coinPieces() {
+  const out = {};
+  COIN_DENOMS.forEach(d => {
+    const id = "coin_" + toCents(d);
+    const v = parseInt(document.getElementById(id).value, 10);
+    out[d] = isNaN(v) || v < 0 ? 0 : v;
+  });
+  return out;
+}
+
+function updateCoinSubtotals() {
+  const pieces = coinPieces();
+  let total = 0;
+  COIN_DENOMS.forEach(d => {
+    const sub = pieces[d] * d;
+    total += sub;
+    document.getElementById("sub_" + toCents(d)).textContent = fmt(sub);
+  });
+  document.getElementById("coinsTotal").textContent = fmt(total);
+  // any manual edit after confirming invalidates the combo panel
+  document.getElementById("comboBox").classList.remove("show");
+  return total;
+}
+
+document.querySelectorAll(".coinInput").forEach(inp => {
+  inp.addEventListener("input", updateCoinSubtotals);
+});
+
+function confirmCoins() {
+  const total = updateCoinSubtotals();
+  const totalCents = toCents(total);
+  const wholeCents = Math.floor(totalCents / 100) * 100;
+  const remainderCents = totalCents - wholeCents;
+
+  if (remainderCents === 0) {
+    document.getElementById("comboBox").classList.remove("show");
+    revealNotesSection();
+    return;
+  }
+
+  const pieces = coinPieces();
+  const piecesCents = {};
+  COIN_DENOMS.forEach(d => piecesCents[toCents(d)] = pieces[d]);
+
+  currentCombos = findCombos(remainderCents, piecesCents);
+  selectedComboIndex = currentCombos.length ? 0 : -1;
+  renderCombos(remainderCents);
+}
+
+// find distinct coin combos (respecting available piece counts) that sum to targetCents
+function findCombos(targetCents, availableCents) {
+  const denoms = [50, 20, 10, 5]; // largest first
+  const results = [];
+
+  function backtrack(idx, remaining, picked) {
+    if (results.length >= 6) return;
+    if (remaining === 0) {
+      results.push({ ...picked });
+      return;
+    }
+    if (idx >= denoms.length) return;
+    const d = denoms[idx];
+    const maxUse = Math.min(Math.floor(remaining / d), availableCents[d] || 0);
+    for (let use = maxUse; use >= 0; use--) {
+      picked[d] = use;
+      backtrack(idx + 1, remaining - use * d, picked);
+      if (results.length >= 6) { delete picked[d]; return; }
+    }
+    delete picked[d];
+  }
+  backtrack(0, targetCents, {});
+  return results;
+}
+
+function renderCombos(remainderCents) {
+  document.getElementById("remainderLabel").textContent = fmt(remainderCents / 100);
+  const list = document.getElementById("comboList");
+  list.innerHTML = "";
+
+  if (currentCombos.length === 0) {
+    list.innerHTML = '<p class="muted">Not enough coins entered to make this remainder. Add more pieces or adjust counts.</p>';
+    document.getElementById("comboBox").classList.add("show");
+    return;
+  }
+
+  currentCombos.forEach((combo, i) => {
+    const parts = [];
+    let coinCount = 0;
+    [50, 20, 10, 5].forEach(d => {
+      if (combo[d]) {
+        parts.push((d / 100).toFixed(2) + " x " + combo[d]);
+        coinCount += combo[d];
+      }
+    });
+    const div = document.createElement("div");
+    div.className = "comboOption" + (i === selectedComboIndex ? " selected" : "");
+    div.innerHTML = "<span>" + parts.join(" + ") + "</span><span>" + coinCount + " coins</span>";
+    div.onclick = () => {
+      selectedComboIndex = i;
+      renderCombos(remainderCents);
+    };
+    list.appendChild(div);
+  });
+
+  document.getElementById("comboBox").classList.add("show");
+}
+
+function confirmComboSelection() {
+  if (selectedComboIndex < 0 || !currentCombos[selectedComboIndex]) return;
+  const combo = currentCombos[selectedComboIndex];
+
+  // deduct chosen combo from float coin inputs, add to movedCoins
+  [50, 20, 10, 5].forEach(dCents => {
+    const use = combo[dCents] || 0;
+    if (use > 0) {
+      const d = dCents / 100;
+      const id = "coin_" + dCents;
+      const input = document.getElementById(id);
+      const current = parseInt(input.value, 10) || 0;
+      input.value = Math.max(0, current - use);
+      movedCoins[d] = (movedCoins[d] || 0) + use;
+    }
+  });
+
+  updateCoinSubtotals();
+  document.getElementById("comboBox").classList.remove("show");
+  renderMovedCoins();
+  revealNotesSection();
+}
+
+// ---------- FLOAT: notes ----------
+function revealNotesSection() {
+  document.getElementById("notesSection").classList.remove("hidden");
+  updateFloatTotals();
+}
+
+function updateFloatTotals() {
+  const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
+  let notesTotal = 0;
+  [1, 5, 10].forEach(v => {
+    const input = document.getElementById("note_" + v);
+    const pieces = parseInt(input.value, 10) || 0;
+    const sub = pieces * v;
+    notesTotal += sub;
+    document.getElementById("subnote_" + v).textContent = fmt(sub);
+  });
+  document.getElementById("notesTotal").textContent = fmt(notesTotal);
+
+  const grand = coinsTotal + notesTotal;
+  document.getElementById("floatGrandTotal").textContent = fmt(grand);
+
+  const remaining = 200 - grand;
+  const remEl = document.getElementById("remainingToTarget");
+  const remRow = document.getElementById("remainingRow");
+  remEl.textContent = fmt(Math.abs(remaining)) + (remaining < 0 ? " over" : remaining === 0 ? " — target reached" : "");
+  remRow.className = "infoRow " + (remaining === 0 ? "good" : remaining > 0 ? "warn" : "warn");
+}
+
+document.querySelectorAll(".noteInput").forEach(inp => {
+  inp.addEventListener("input", updateFloatTotals);
+});
+
+// ---------- SALE ----------
+function renderMovedCoins() {
+  const box = document.getElementById("movedCoinsList");
+  const denomsPresent = COIN_DENOMS.filter(d => movedCoins[d] > 0);
+  if (denomsPresent.length === 0) {
+    box.innerHTML = '<p class="muted" style="margin:0;">No coins moved from float yet</p>';
+    updateSalesTotals();
+    return;
+  }
+  let html = "";
+  let total = 0;
+  denomsPresent.forEach(d => {
+    const pcs = movedCoins[d];
+    const sub = pcs * d;
+    total += sub;
+    html += '<div class="row"><span>RM' + d.toFixed(2) + '</span><span>' + pcs + ' pc</span><span>' + fmt(sub) + '</span></div>';
+  });
+  html += '<div class="row total"><span>Coins subtotal</span><span></span><span>' + fmt(total) + '</span></div>';
+  box.innerHTML = html;
+  updateSalesTotals();
+}
+
+function updateSalesTotals() {
+  const coinsMovedTotal = COIN_DENOMS.reduce((sum, d) => sum + (movedCoins[d] || 0) * d, 0);
+  let notesTotal = 0;
+  [1, 5, 10, 50, 100].forEach(v => {
+    const input = document.getElementById("salenote_" + v);
+    const pieces = parseInt(input.value, 10) || 0;
+    const sub = pieces * v;
+    notesTotal += sub;
+    document.getElementById("subsalenote_" + v).textContent = fmt(sub);
+  });
+  document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesTotal);
+}
+
+document.querySelectorAll(".saleNoteInput").forEach(inp => {
+  inp.addEventListener("input", updateSalesTotals);
+});
+
+// ---------- reset ----------
+function resetAll() {
+  document.querySelectorAll(".coinInput, .noteInput, .saleNoteInput").forEach(inp => inp.value = 0);
+  movedCoins = {};
+  currentCombos = [];
+  selectedComboIndex = -1;
+  document.getElementById("comboBox").classList.remove("show");
+  document.getElementById("notesSection").classList.add("hidden");
+  updateCoinSubtotals();
+  renderMovedCoins();
+}
+
+// ---------- init ----------
+updateCoinSubtotals();
+renderMovedCoins();
+</script>
+</body>
+</html>
