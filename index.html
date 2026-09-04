@@ -2,31 +2,34 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Cashier Counting System</title>
 <style>
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     font-family: Arial, Helvetica, sans-serif;
     background: #f2f3f5;
     margin: 0;
-    padding: 24px;
+    padding: 16px;
     color: #222;
   }
   h1 {
     text-align: center;
-    font-size: 22px;
-    margin-bottom: 24px;
+    font-size: 20px;
+    margin-bottom: 20px;
   }
   .wrap {
     max-width: 520px;
     margin: 0 auto;
+    width: 100%;
   }
   .card {
     background: #fff;
     border-radius: 10px;
     border: 1px solid #ddd;
-    padding: 18px 20px;
-    margin-bottom: 24px;
+    padding: 16px;
+    margin-bottom: 20px;
   }
   .card h2 {
     font-size: 17px;
@@ -41,6 +44,7 @@
     width: 100%;
     border-collapse: collapse;
     font-size: 14px;
+    table-layout: fixed;
   }
   th {
     text-align: left;
@@ -51,13 +55,17 @@
     border-bottom: 1px solid #eee;
   }
   th:last-child, td:last-child { text-align: right; }
-  td { padding: 6px 0; vertical-align: middle; }
+  td { padding: 6px 2px; vertical-align: middle; }
+  td:first-child { width: 30%; }
+  td:nth-child(2) { width: 38%; }
+  td:last-child { width: 32%; overflow-wrap: break-word; font-size: 13px; }
   input[type=number] {
-    width: 90px;
-    padding: 6px 8px;
+    width: 100%;
+    max-width: 90px;
+    padding: 8px 6px;
     border: 1px solid #ccc;
     border-radius: 6px;
-    font-size: 14px;
+    font-size: 16px;
   }
   .totalRow {
     display: flex;
@@ -105,18 +113,53 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 8px 12px;
-    margin-bottom: 6px;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
     cursor: pointer;
     font-size: 13px;
+  }
+  .comboOption .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #fff;
+  }
+  .chip .count {
+    background: rgba(255,255,255,0.35);
+    border-radius: 999px;
+    padding: 1px 7px;
+    font-size: 11px;
+  }
+  .chip-50 { background: #6a4fb3; }
+  .chip-20 { background: #2f9e6f; }
+  .chip-10 { background: #d68a1f; }
+  .chip-5  { background: #cf4b4b; }
+  @media (max-width: 380px) {
+    h1 { font-size: 18px; }
+    .card { padding: 14px 12px; }
+    table { font-size: 13px; }
+    input[type=number] { max-width: 72px; padding: 7px 5px; }
+    .totalRow span:last-child { font-size: 16px; }
   }
   .comboOption.selected {
     border-color: #2f6fed;
     background: #eaf0fe;
+    box-shadow: 0 0 0 1px #2f6fed inset;
   }
-  .comboOption span:last-child { color: #777; font-size: 12px; }
+  .comboOption .coinCount { color: #777; font-size: 12px; white-space: nowrap; }
   .hidden { display: none; }
   .movedList {
     background: #f7f7f8;
@@ -369,17 +412,17 @@ function renderCombos(remainderCents) {
   }
 
   currentCombos.forEach((combo, i) => {
-    const parts = [];
     let coinCount = 0;
+    const chips = [];
     [50, 20, 10, 5].forEach(d => {
       if (combo[d]) {
-        parts.push((d / 100).toFixed(2) + " x " + combo[d]);
         coinCount += combo[d];
+        chips.push('<span class="chip chip-' + d + '">RM' + (d / 100).toFixed(2) + '<span class="count">x' + combo[d] + '</span></span>');
       }
     });
     const div = document.createElement("div");
     div.className = "comboOption" + (i === selectedComboIndex ? " selected" : "");
-    div.innerHTML = "<span>" + parts.join(" + ") + "</span><span>" + coinCount + " coins</span>";
+    div.innerHTML = '<span class="chips">' + chips.join("") + '</span><span class="coinCount">' + coinCount + ' coins</span>';
     div.onclick = () => {
       selectedComboIndex = i;
       renderCombos(remainderCents);
@@ -460,9 +503,10 @@ function renderMovedCoins() {
     const pcs = movedCoins[d];
     const sub = pcs * d;
     total += sub;
-    html += '<div class="row"><span>RM' + d.toFixed(2) + '</span><span>' + pcs + ' pc</span><span>' + fmt(sub) + '</span></div>';
+    const dCents = toCents(d);
+    html += '<div class="row"><span class="chip chip-' + dCents + '">RM' + d.toFixed(2) + '<span class="count">x' + pcs + '</span></span><span>' + fmt(sub) + '</span></div>';
   });
-  html += '<div class="row total"><span>Coins subtotal</span><span></span><span>' + fmt(total) + '</span></div>';
+  html += '<div class="row total"><span>Coins subtotal</span><span>' + fmt(total) + '</span></div>';
   box.innerHTML = html;
   updateSalesTotals();
 }
@@ -495,6 +539,13 @@ function resetAll() {
   updateCoinSubtotals();
   renderMovedCoins();
 }
+
+// ---------- focus behavior: select existing value so typing replaces it ----------
+document.querySelectorAll('input[type=number]').forEach(inp => {
+  inp.addEventListener('focus', function () {
+    this.select();
+  });
+});
 
 // ---------- init ----------
 updateCoinSubtotals();
