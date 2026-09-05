@@ -289,31 +289,12 @@
     <h2>Sale</h2>
     <p class="sub">No target — totals whatever is counted</p>
 
-    <div class="movedList" id="movedCoinsList">
-      <p class="muted" style="margin:0;">No coins moved from float yet</p>
-    </div>
-
     <table>
-      <tr><th>Note</th><th>Pieces</th><th>Subtotal</th></tr>
+      <tr><th>Denom</th><th>Pieces</th><th>Subtotal</th></tr>
       <tr>
-        <td>RM1</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="1" id="salenote_1"></td>
-        <td class="subtotal" id="subsalenote_1">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM5</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="5" id="salenote_5"></td>
-        <td class="subtotal" id="subsalenote_5">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM10</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="10" id="salenote_10"></td>
-        <td class="subtotal" id="subsalenote_10">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM20</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="20" id="salenote_20"></td>
-        <td class="subtotal" id="subsalenote_20">RM0.00</td>
+        <td>RM100</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="100" id="salenote_100"></td>
+        <td class="subtotal" id="subsalenote_100">RM0.00</td>
       </tr>
       <tr>
         <td>RM50</td>
@@ -321,11 +302,49 @@
         <td class="subtotal" id="subsalenote_50">RM0.00</td>
       </tr>
       <tr>
-        <td>RM100</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="100" id="salenote_100"></td>
-        <td class="subtotal" id="subsalenote_100">RM0.00</td>
+        <td>RM20</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="20" id="salenote_20"></td>
+        <td class="subtotal" id="subsalenote_20">RM0.00</td>
       </tr>
+      <tr>
+        <td>RM10</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="10" id="salenote_10"></td>
+        <td class="subtotal" id="subsalenote_10">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM5</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="5" id="salenote_5"></td>
+        <td class="subtotal" id="subsalenote_5">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM1</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="1" id="salenote_1"></td>
+        <td class="subtotal" id="subsalenote_1">RM0.00</td>
+      </tr>
+      <tbody class="lockedSection" style="display:table-row-group;">
+        <tr>
+          <td>RM0.50</td>
+          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_50" disabled></td>
+          <td class="subtotal" id="subsalecoin_50">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.20</td>
+          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_20" disabled></td>
+          <td class="subtotal" id="subsalecoin_20">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.10</td>
+          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_10" disabled></td>
+          <td class="subtotal" id="subsalecoin_10">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.05</td>
+          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_5" disabled></td>
+          <td class="subtotal" id="subsalecoin_5">RM0.00</td>
+        </tr>
+      </tbody>
     </table>
+    <p class="muted" style="margin-top:6px;">Coins above are moved automatically from Float and can't be edited here</p>
 
     <div class="totalRow">
       <span>Sales total</span>
@@ -536,24 +555,12 @@ document.querySelectorAll(".noteInput").forEach(inp => {
 
 // ---------- SALE ----------
 function renderMovedCoins() {
-  const box = document.getElementById("movedCoinsList");
-  const denomsPresent = COIN_DENOMS.filter(d => movedCoins[d] > 0);
-  if (denomsPresent.length === 0) {
-    box.innerHTML = '<p class="muted" style="margin:0;">No coins moved from float yet</p>';
-    updateSalesTotals();
-    return;
-  }
-  let html = "";
-  let total = 0;
-  denomsPresent.forEach(d => {
-    const pcs = movedCoins[d];
-    const sub = pcs * d;
-    total += sub;
+  COIN_DENOMS.forEach(d => {
     const dCents = toCents(d);
-    html += '<div class="row"><span class="chip chip-' + dCents + '">RM' + d.toFixed(2) + '<span class="count">x' + pcs + '</span></span><span>' + fmt(sub) + '</span></div>';
+    const pcs = movedCoins[d] || 0;
+    document.getElementById("salecoin_" + dCents).value = pcs;
+    document.getElementById("subsalecoin_" + dCents).textContent = fmt(pcs * d);
   });
-  html += '<div class="row total"><span>Coins subtotal</span><span>' + fmt(total) + '</span></div>';
-  box.innerHTML = html;
   updateSalesTotals();
 }
 
