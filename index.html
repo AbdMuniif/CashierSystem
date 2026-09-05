@@ -530,6 +530,9 @@ document.querySelectorAll(".saleNoteInput").forEach(inp => {
 
 // ---------- reset ----------
 function resetAll() {
+  const confirmed = confirm("Reset all counts? This will clear everything you've entered.");
+  if (!confirmed) return;
+
   document.querySelectorAll(".coinInput, .noteInput, .saleNoteInput").forEach(inp => inp.value = 0);
   movedCoins = {};
   currentCombos = [];
