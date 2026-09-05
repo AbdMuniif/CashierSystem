@@ -180,6 +180,22 @@
     font-weight: bold;
   }
   .muted { color: #999; font-size: 12px; }
+  .lockedSection {
+    opacity: 0.45;
+    pointer-events: none;
+    position: relative;
+  }
+  .lockNotice {
+    font-size: 12px;
+    color: #b35c00;
+    background: #fff6e8;
+    border: 1px solid #f0d6a8;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    pointer-events: none;
+  }
+  .lockNotice.hidden { display: none; }
 </style>
 </head>
 <body>
@@ -191,32 +207,58 @@
     <h2>Float</h2>
     <p class="sub">Target float: RM200.00</p>
 
+    <p class="lockNotice" id="lockNotice">Confirm coins first to unlock RM1 / RM5 / RM10 / RM20</p>
+
     <table>
-      <tr><th>Coin</th><th>Pieces</th><th>Subtotal</th></tr>
-      <tr>
-        <td>RM0.05</td>
-        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.05" id="coin_5"></td>
-        <td class="subtotal" id="sub_5">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM0.10</td>
-        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.10" id="coin_10"></td>
-        <td class="subtotal" id="sub_10">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM0.20</td>
-        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.20" id="coin_20"></td>
-        <td class="subtotal" id="sub_20">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM0.50</td>
-        <td><input type="number" min="0" value="0" class="coinInput" data-value="0.50" id="coin_50"></td>
-        <td class="subtotal" id="sub_50">RM0.00</td>
-      </tr>
+      <tr><th>Denom</th><th>Pieces</th><th>Subtotal</th></tr>
+      <tbody id="notesSection" class="lockedSection">
+        <tr>
+          <td>RM20</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="20" id="note_20" disabled></td>
+          <td class="subtotal" id="subnote_20">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM10</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="10" id="note_10" disabled></td>
+          <td class="subtotal" id="subnote_10">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM5</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="5" id="note_5" disabled></td>
+          <td class="subtotal" id="subnote_5">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM1</td>
+          <td><input type="number" min="0" value="0" class="noteInput" data-value="1" id="note_1" disabled></td>
+          <td class="subtotal" id="subnote_1">RM0.00</td>
+        </tr>
+      </tbody>
+      <tbody>
+        <tr>
+          <td>RM0.50</td>
+          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.50" id="coin_50"></td>
+          <td class="subtotal" id="sub_50">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.20</td>
+          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.20" id="coin_20"></td>
+          <td class="subtotal" id="sub_20">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.10</td>
+          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.10" id="coin_10"></td>
+          <td class="subtotal" id="sub_10">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM0.05</td>
+          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.05" id="coin_5"></td>
+          <td class="subtotal" id="sub_5">RM0.00</td>
+        </tr>
+      </tbody>
     </table>
 
-    <div class="totalRow">
-      <span>Coins total</span>
+    <div class="infoRow">
+      <span>Coins subtotal</span>
       <span id="coinsTotal">RM0.00</span>
     </div>
 
@@ -228,38 +270,17 @@
       <button onclick="confirmComboSelection()">Confirm deduction</button>
     </div>
 
-    <div id="notesSection" class="hidden">
-      <table style="margin-top:18px;">
-        <tr><th>Note</th><th>Pieces</th><th>Subtotal</th></tr>
-        <tr>
-          <td>RM1</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="1" id="note_1"></td>
-          <td class="subtotal" id="subnote_1">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM5</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="5" id="note_5"></td>
-          <td class="subtotal" id="subnote_5">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM10</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="10" id="note_10"></td>
-          <td class="subtotal" id="subnote_10">RM0.00</td>
-        </tr>
-      </table>
-
-      <div class="infoRow">
-        <span>Notes total</span>
-        <span id="notesTotal">RM0.00</span>
-      </div>
-      <div class="infoRow" id="remainingRow">
-        <span>Remaining to RM200</span>
-        <span id="remainingToTarget">RM154.00</span>
-      </div>
-      <div class="totalRow">
-        <span>Float total</span>
-        <span id="floatGrandTotal">RM0.00</span>
-      </div>
+    <div class="infoRow">
+      <span>Notes subtotal</span>
+      <span id="notesTotal">RM0.00</span>
+    </div>
+    <div class="infoRow" id="remainingRow">
+      <span>Remaining to RM200</span>
+      <span id="remainingToTarget">RM154.00</span>
+    </div>
+    <div class="totalRow">
+      <span>Float total</span>
+      <span id="floatGrandTotal">RM0.00</span>
     </div>
   </div>
 
@@ -288,6 +309,11 @@
         <td>RM10</td>
         <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="10" id="salenote_10"></td>
         <td class="subtotal" id="subsalenote_10">RM0.00</td>
+      </tr>
+      <tr>
+        <td>RM20</td>
+        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="20" id="salenote_20"></td>
+        <td class="subtotal" id="subsalenote_20">RM0.00</td>
       </tr>
       <tr>
         <td>RM50</td>
@@ -345,13 +371,20 @@ function updateCoinSubtotals() {
     document.getElementById("sub_" + toCents(d)).textContent = fmt(sub);
   });
   document.getElementById("coinsTotal").textContent = fmt(total);
-  // any manual edit after confirming invalidates the combo panel
   document.getElementById("comboBox").classList.remove("show");
   return total;
 }
 
+function onCoinInputChanged() {
+  updateCoinSubtotals();
+  // editing coins after confirming invalidates the previous split, so re-lock notes
+  if (!document.getElementById("notesSection").classList.contains("lockedSection")) {
+    lockNotesSection();
+  }
+}
+
 document.querySelectorAll(".coinInput").forEach(inp => {
-  inp.addEventListener("input", updateCoinSubtotals);
+  inp.addEventListener("input", onCoinInputChanged);
 });
 
 function confirmCoins() {
@@ -454,18 +487,31 @@ function confirmComboSelection() {
   document.getElementById("comboBox").classList.remove("show");
   renderMovedCoins();
   revealNotesSection();
+  saveState();
 }
 
 // ---------- FLOAT: notes ----------
 function revealNotesSection() {
-  document.getElementById("notesSection").classList.remove("hidden");
+  document.getElementById("notesSection").classList.remove("lockedSection");
+  document.getElementById("lockNotice").classList.add("hidden");
+  [1, 5, 10, 20].forEach(v => {
+    document.getElementById("note_" + v).disabled = false;
+  });
   updateFloatTotals();
+}
+
+function lockNotesSection() {
+  document.getElementById("notesSection").classList.add("lockedSection");
+  document.getElementById("lockNotice").classList.remove("hidden");
+  [1, 5, 10, 20].forEach(v => {
+    document.getElementById("note_" + v).disabled = true;
+  });
 }
 
 function updateFloatTotals() {
   const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
   let notesTotal = 0;
-  [1, 5, 10].forEach(v => {
+  [1, 5, 10, 20].forEach(v => {
     const input = document.getElementById("note_" + v);
     const pieces = parseInt(input.value, 10) || 0;
     const sub = pieces * v;
@@ -514,7 +560,7 @@ function renderMovedCoins() {
 function updateSalesTotals() {
   const coinsMovedTotal = COIN_DENOMS.reduce((sum, d) => sum + (movedCoins[d] || 0) * d, 0);
   let notesTotal = 0;
-  [1, 5, 10, 50, 100].forEach(v => {
+  [1, 5, 10, 20, 50, 100].forEach(v => {
     const input = document.getElementById("salenote_" + v);
     const pieces = parseInt(input.value, 10) || 0;
     const sub = pieces * v;
@@ -538,9 +584,10 @@ function resetAll() {
   currentCombos = [];
   selectedComboIndex = -1;
   document.getElementById("comboBox").classList.remove("show");
-  document.getElementById("notesSection").classList.add("hidden");
+  lockNotesSection();
   updateCoinSubtotals();
   renderMovedCoins();
+  clearSavedState();
 }
 
 // ---------- focus behavior: select existing value so typing replaces it ----------
@@ -550,9 +597,85 @@ document.querySelectorAll('input[type=number]').forEach(inp => {
   });
 });
 
+// ---------- persistence (saved locally on this device/browser only) ----------
+const STORAGE_KEY = "cashier_system_state_v1";
+
+function saveState() {
+  const state = {
+    coins: {},
+    notes: {},
+    saleNotes: {},
+    movedCoins,
+    notesVisible: !document.getElementById("notesSection").classList.contains("lockedSection")
+  };
+  COIN_DENOMS.forEach(d => {
+    state.coins[toCents(d)] = document.getElementById("coin_" + toCents(d)).value;
+  });
+  [1, 5, 10, 20].forEach(v => {
+    state.notes[v] = document.getElementById("note_" + v).value;
+  });
+  [1, 5, 10, 20, 50, 100].forEach(v => {
+    state.saleNotes[v] = document.getElementById("salenote_" + v).value;
+  });
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { /* storage unavailable, ignore */ }
+}
+
+function loadState() {
+  let raw;
+  try {
+    raw = localStorage.getItem(STORAGE_KEY);
+  } catch (e) { return; }
+  if (!raw) return;
+
+  let state;
+  try {
+    state = JSON.parse(raw);
+  } catch (e) { return; }
+
+  COIN_DENOMS.forEach(d => {
+    const v = state.coins && state.coins[toCents(d)];
+    if (v !== undefined) document.getElementById("coin_" + toCents(d)).value = v;
+  });
+  [1, 5, 10, 20].forEach(v => {
+    const val = state.notes && state.notes[v];
+    if (val !== undefined) document.getElementById("note_" + v).value = val;
+  });
+  [1, 5, 10, 20, 50, 100].forEach(v => {
+    const val = state.saleNotes && state.saleNotes[v];
+    if (val !== undefined) document.getElementById("salenote_" + v).value = val;
+  });
+  if (state.movedCoins) {
+    movedCoins = {};
+    Object.keys(state.movedCoins).forEach(k => movedCoins[k] = state.movedCoins[k]);
+  }
+  if (state.notesVisible) {
+    document.getElementById("notesSection").classList.remove("lockedSection");
+    document.getElementById("lockNotice").classList.add("hidden");
+    [1, 5, 10, 20].forEach(v => {
+      document.getElementById("note_" + v).disabled = false;
+    });
+  }
+}
+
+function clearSavedState() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) { /* ignore */ }
+}
+
 // ---------- init ----------
+loadState();
 updateCoinSubtotals();
 renderMovedCoins();
+updateFloatTotals();
+updateSalesTotals();
+
+// save on every input change (covers coin/note/saleNote inputs)
+document.querySelectorAll('input[type=number]').forEach(inp => {
+  inp.addEventListener('input', saveState);
+});
 </script>
 </body>
 </html>
