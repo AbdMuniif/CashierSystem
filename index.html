@@ -296,6 +296,7 @@ function confirmCoins() {
     lockCoinsSection();
     revealNotesSection();
     saveState();
+    window.scrollTo({ top: 0, behavior: "smooth" });
     return;
   }
 
@@ -349,6 +350,7 @@ function confirmComboSelection() {
   lockCoinsSection();
   revealNotesSection();
   saveState();
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // ---------- FLOAT: notes ----------
