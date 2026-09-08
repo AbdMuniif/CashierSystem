@@ -742,7 +742,19 @@ function confirmNotes() {
   const total = Math.round(coinsTotal + notesTotal);
   const excess = total - 200;
 
-  if (excess <= 0) {
+  if (excess === 0) {
+    lockConfirmedNotes();
+    saveState();
+    return;
+  }
+
+  if (excess < 0) {
+    const shortfall = Math.abs(excess);
+    const proceed = confirm(
+      "Float is short by " + fmt(shortfall) + " (total is " + fmt(total) + " instead of RM200.00).\n\n" +
+      "Press OK to accept this as the float anyway, or Cancel to go back and add more notes/coins."
+    );
+    if (!proceed) return;
     lockConfirmedNotes();
     saveState();
     return;
