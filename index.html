@@ -648,7 +648,14 @@ function drawExchangeCombos(giveDenoms) {
     return;
   }
 
-  let html = '<p class="sub" style="margin-top:14px;">Give RM' + exchangeBatchValue + ' worth, receive ' + receivePieces + ' x RM' + exchangeTarget + '</p><div id="exchangeComboList"></div><button id="confirmExchangeBtn">Confirm exchange</button>';
+  const saleHasMatchingNote = (movedNotes[exchangeBatchValue] || 0) >= 1;
+
+  let html = '<p class="sub" style="margin-top:14px;">Give RM' + exchangeBatchValue + ' worth, receive ' + receivePieces + ' x RM' + exchangeTarget + '</p><div id="exchangeComboList"></div>';
+  if (saleHasMatchingNote) {
+    html += '<label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px;">' +
+      '<input type="checkbox" id="useSaleNoteCheckbox"> Hand over a Sale RM' + exchangeBatchValue + ' note instead (Sale keeps the combo pieces from Float, its total stays the same)</label>';
+  }
+  html += '<button id="confirmExchangeBtn">Confirm exchange</button>';
   area.innerHTML = html;
   const list = document.getElementById("exchangeComboList");
 
@@ -671,20 +678,30 @@ function drawExchangeCombos(giveDenoms) {
 function confirmExchange(giveDenoms) {
   if (selectedExchangeComboIndex < 0 || !currentExchangeCombos[selectedExchangeComboIndex]) return;
   const combo = currentExchangeCombos[selectedExchangeComboIndex];
+  const checkbox = document.getElementById("useSaleNoteCheckbox");
+  const useSaleNote = checkbox && checkbox.checked;
 
   giveDenoms.forEach(v => {
     const use = combo[v] || 0;
     if (use > 0) {
       const input = document.getElementById("note_" + v);
       input.value = Math.max(0, (parseInt(input.value, 10) || 0) - use);
+      if (useSaleNote) {
+        movedNotes[v] = (movedNotes[v] || 0) + use; // combo pieces move into Sale instead of straight to SV
+      }
     }
   });
+
+  if (useSaleNote) {
+    movedNotes[exchangeBatchValue] = Math.max(0, (movedNotes[exchangeBatchValue] || 0) - 1); // Sale's big note is handed to SV
+  }
 
   const receivePieces = exchangeBatchValue / exchangeTarget;
   const targetInput = document.getElementById("note_" + exchangeTarget);
   targetInput.value = (parseInt(targetInput.value, 10) || 0) + receivePieces;
 
   updateFloatTotals();
+  renderMovedNotes();
   checkFloatMinimums();
   refreshAllRowHighlights();
   saveState();
@@ -791,12 +808,10 @@ function initRowHighlighting() {
 function buildSummaryText() {
   const lines = [];
   lines.push("FLOAT");
-  lines.push("Notes:");
-  NOTE_ALL.forEach(v => {
+  NOTE_ELIGIBLE.forEach(v => {
     const val = parseInt(document.getElementById('note_' + v).value, 10) || 0;
     lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
   });
-  lines.push("Coins:");
   COIN_DENOMS.slice().reverse().forEach(d => {
     const val = parseInt(document.getElementById('coin_' + toCents(d)).value, 10) || 0;
     lines.push('RM' + d.toFixed(2) + ' x ' + val + ' = ' + fmt(val * d));
@@ -804,12 +819,10 @@ function buildSummaryText() {
   lines.push('Float total: ' + document.getElementById('floatGrandTotal').textContent);
   lines.push('');
   lines.push("SALE");
-  lines.push("Notes moved from float:");
   NOTE_ALL.forEach(v => {
     const pcs = movedNotes[v] || 0;
     lines.push('RM' + v + ' x ' + pcs + ' = ' + fmt(pcs * v));
   });
-  lines.push("Coins moved from float:");
   COIN_DENOMS.slice().reverse().forEach(d => {
     const pcs = movedCoins[d] || 0;
     lines.push('RM' + d.toFixed(2) + ' x ' + pcs + ' = ' + fmt(pcs * d));
