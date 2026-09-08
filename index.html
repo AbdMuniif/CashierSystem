@@ -458,13 +458,12 @@ function confirmNotes() {
 
   if (excess < 0) {
     const shortfall = Math.abs(excess);
-    const proceed = confirm(
+    alert(
       "Float is short by " + fmt(shortfall) + " (total is " + fmt(total) + " instead of RM200.00).\n\n" +
-      "Press OK to accept this as the float anyway, or Cancel to go back and add more notes/coins."
+      "Press OK to exchange some money with your Supervisor."
     );
-    if (!proceed) return;
-    lockConfirmedNotes();
-    saveState();
+    const exchangeCard = document.getElementById("exchangeCard");
+    if (exchangeCard) exchangeCard.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
 
@@ -622,9 +621,22 @@ document.querySelectorAll(".exchangeTargetBtn").forEach(btn => {
   });
 });
 
+function computeFloatShortfall() {
+  const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
+  let eligibleTotal = 0;
+  NOTE_ELIGIBLE.forEach(v => { eligibleTotal += (parseInt(document.getElementById('note_' + v).value, 10) || 0) * v; });
+  return 200 - (coinsTotal + eligibleTotal);
+}
+
 function renderExchangeCombos() {
   const area = document.getElementById("exchangeComboArea");
   if (!exchangeTarget || !exchangeBatchValue) { area.innerHTML = ""; return; }
+
+  const shortfall = computeFloatShortfall();
+  if (shortfall > 0) {
+    renderTopupExchange(shortfall);
+    return;
+  }
 
   const giveDenoms = NOTE_ELIGIBLE.filter(v => v !== exchangeTarget);
   const available = {};
@@ -633,11 +645,58 @@ function renderExchangeCombos() {
     const min = FLOAT_MIN[v] || 0;
     available[v] = Math.max(0, pcs - min);
   });
-
   currentExchangeCombos = findCombos(exchangeBatchValue, available, giveDenoms);
   selectedExchangeComboIndex = currentExchangeCombos.length ? 0 : -1;
   drawExchangeCombos(giveDenoms);
 }
+
+// ---- Mode 1: Float is short of RM200 — top up from Sale, no compensation owed back ----
+function renderTopupExchange(shortfall) {
+  const area = document.getElementById("exchangeComboArea");
+  const saleNoteAvailable = (movedNotes[exchangeBatchValue] || 0) >= 1;
+
+  if (!saleNoteAvailable) {
+    area.innerHTML = '<p class="muted" style="margin-top:10px;">No RM' + exchangeBatchValue + ' note available in Sale for this exchange.</p>';
+    return;
+  }
+
+  const receivePieces = exchangeBatchValue / exchangeTarget;
+  const neededPieces = Math.min(receivePieces, Math.ceil(shortfall / exchangeTarget));
+  const leftoverPieces = receivePieces - neededPieces;
+
+  area.innerHTML =
+    '<p class="sub" style="margin-top:14px;">Float is short by ' + fmt(shortfall) + '. Give 1x RM' + exchangeBatchValue + ' from Sale, receive ' + receivePieces + 'x RM' + exchangeTarget + '.</p>' +
+    '<div class="comboOption selected"><span class="chips">' +
+    '<span class="chip chip-note-' + exchangeTarget + '">RM' + exchangeTarget + '<span class="count">Float +' + neededPieces + '</span></span>' +
+    (leftoverPieces > 0 ? '<span class="chip chip-note-' + exchangeTarget + '" style="background:#999;">RM' + exchangeTarget + '<span class="count">Sale +' + leftoverPieces + '</span></span>' : '') +
+    '</span></div>' +
+    '<button id="confirmExchangeBtn">Confirm exchange</button>';
+
+  document.getElementById("confirmExchangeBtn").onclick = () => confirmTopupExchange(neededPieces, leftoverPieces);
+}
+
+function confirmTopupExchange(neededPieces, leftoverPieces) {
+  movedNotes[exchangeBatchValue] = Math.max(0, (movedNotes[exchangeBatchValue] || 0) - 1);
+  const targetInput = document.getElementById("note_" + exchangeTarget);
+  targetInput.value = (parseInt(targetInput.value, 10) || 0) + neededPieces;
+  if (leftoverPieces > 0) {
+    movedNotes[exchangeTarget] = (movedNotes[exchangeTarget] || 0) + leftoverPieces;
+  }
+
+  updateFloatTotals();
+  renderMovedNotes();
+  checkFloatMinimums();
+  refreshAllRowHighlights();
+  saveState();
+
+  document.getElementById("exchangeComboArea").innerHTML = '<p class="muted" style="margin-top:10px;">Exchange complete.</p>';
+  document.querySelectorAll(".exchangeTargetBtn").forEach(b => b.classList.remove("active"));
+  document.getElementById("exchangeBatchArea").classList.add("hidden");
+  exchangeTarget = null;
+  exchangeBatchValue = null;
+}
+
+// ---- Mode 2: Float already at RM200 — rebalance the mix, total stays fixed ----
 
 function drawExchangeCombos(giveDenoms) {
   const area = document.getElementById("exchangeComboArea");
