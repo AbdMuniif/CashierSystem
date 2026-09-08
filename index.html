@@ -269,7 +269,7 @@
           <td class="subtotal" id="subnote_1">RM0.00</td>
         </tr>
       </tbody>
-      <tbody>
+      <tbody id="coinsSection">
         <tr>
           <td>RM0.50</td>
           <td><input type="number" min="0" value="0" class="coinInput" data-value="0.50" id="coin_50"></td>
@@ -299,6 +299,7 @@
     </div>
 
     <button id="confirmCoinsBtn" onclick="confirmCoins()">Confirm coins</button>
+    <button id="editCoinsBtn" class="secondary hidden" onclick="editCoins()">Edit coins</button>
 
     <div class="comboBox" id="comboBox">
       <p class="sub" style="margin-top:14px;">Remainder <span id="remainderLabel">RM0.00</span> — choose the coins to move to Sale</p>
@@ -407,6 +408,45 @@ let movedCoins = {}; // e.g. {0.20: 1, 0.10: 1, 0.05: 1}
 let selectedComboIndex = -1;
 let currentCombos = [];
 
+// ---------- FLOAT: coins locking ----------
+function lockCoinsSection() {
+  document.getElementById("coinsSection").classList.add("lockedSection");
+  COIN_DENOMS.forEach(d => {
+    document.getElementById("coin_" + toCents(d)).disabled = true;
+  });
+  document.getElementById("confirmCoinsBtn").classList.add("hidden");
+  document.getElementById("editCoinsBtn").classList.remove("hidden");
+}
+
+function unlockCoinsSection() {
+  document.getElementById("coinsSection").classList.remove("lockedSection");
+  COIN_DENOMS.forEach(d => {
+    document.getElementById("coin_" + toCents(d)).disabled = false;
+  });
+  document.getElementById("confirmCoinsBtn").classList.remove("hidden");
+  document.getElementById("editCoinsBtn").classList.add("hidden");
+}
+
+function editCoins() {
+  // put back any coins that were previously moved to Sale, so the field shows the true total again
+  COIN_DENOMS.forEach(d => {
+    const pcs = movedCoins[d] || 0;
+    if (pcs > 0) {
+      const input = document.getElementById("coin_" + toCents(d));
+      const current = parseInt(input.value, 10) || 0;
+      input.value = current + pcs;
+    }
+  });
+  movedCoins = {};
+  renderMovedCoins();
+  document.getElementById("comboBox").classList.remove("show");
+  lockNotesSection();
+  unlockCoinsSection();
+  updateCoinSubtotals();
+  refreshAllRowHighlights();
+  saveState();
+}
+
 // ---------- FLOAT: coins ----------
 function coinPieces() {
   const out = {};
@@ -435,10 +475,6 @@ function updateCoinSubtotals() {
 
 function onCoinInputChanged() {
   updateCoinSubtotals();
-  // editing coins after confirming invalidates the previous split, so re-lock notes
-  if (!document.getElementById("notesSection").classList.contains("lockedSection")) {
-    lockNotesSection();
-  }
 }
 
 document.querySelectorAll(".coinInput").forEach(inp => {
@@ -453,7 +489,9 @@ function confirmCoins() {
 
   if (remainderCents === 0) {
     document.getElementById("comboBox").classList.remove("show");
+    lockCoinsSection();
     revealNotesSection();
+    saveState();
     return;
   }
 
@@ -544,6 +582,7 @@ function confirmComboSelection() {
   updateCoinSubtotals();
   document.getElementById("comboBox").classList.remove("show");
   renderMovedCoins();
+  lockCoinsSection();
   revealNotesSection();
   saveState();
 }
@@ -635,8 +674,10 @@ function resetAll() {
   selectedComboIndex = -1;
   document.getElementById("comboBox").classList.remove("show");
   lockNotesSection();
+  unlockCoinsSection();
   updateCoinSubtotals();
   renderMovedCoins();
+  refreshAllRowHighlights();
   clearSavedState();
 }
 
@@ -792,7 +833,8 @@ function saveState() {
     notes: {},
     saleNotes: {},
     movedCoins,
-    notesVisible: !document.getElementById("notesSection").classList.contains("lockedSection")
+    notesVisible: !document.getElementById("notesSection").classList.contains("lockedSection"),
+    coinsLocked: document.getElementById("coinsSection").classList.contains("lockedSection")
   };
   COIN_DENOMS.forEach(d => {
     state.coins[toCents(d)] = document.getElementById("coin_" + toCents(d)).value;
@@ -842,6 +884,9 @@ function loadState() {
     [1, 5, 10, 20].forEach(v => {
       document.getElementById("note_" + v).disabled = false;
     });
+  }
+  if (state.coinsLocked) {
+    lockCoinsSection();
   }
 }
 
