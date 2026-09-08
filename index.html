@@ -147,6 +147,10 @@
   .chip-20 { background: #2f9e6f; }
   .chip-10 { background: #d68a1f; }
   .chip-5  { background: #cf4b4b; }
+  .chip-note-20 { background: #6a4fb3; }
+  .chip-note-10 { background: #2f9e6f; }
+  .chip-note-5  { background: #d68a1f; }
+  .chip-note-1  { background: #2f6fed; }
   @media (max-width: 380px) {
     h1 { font-size: 18px; }
     .card { padding: 14px 12px; }
@@ -319,6 +323,15 @@
       <span>Float total</span>
       <span id="floatGrandTotal">RM0.00</span>
     </div>
+
+    <button id="confirmNotesBtn" class="hidden" onclick="confirmNotes()">Confirm notes</button>
+    <button id="editNotesBtn" class="secondary hidden" onclick="editNotes()">Edit notes</button>
+
+    <div class="comboBox" id="noteComboBox">
+      <p class="sub" style="margin-top:14px;">Over by <span id="noteExcessLabel">RM0.00</span> — choose the notes to move to Sale</p>
+      <div id="noteComboList"></div>
+      <button onclick="confirmNoteComboSelection()">Confirm deduction</button>
+    </div>
   </div>
 
   <!-- ============ SALE FORM ============ -->
@@ -359,6 +372,30 @@
         <td class="subtotal" id="subsalenote_1">RM0.00</td>
       </tr>
       <tbody class="lockedSection" style="display:table-row-group;">
+        <tr><td colspan="3" class="muted" style="padding-top:10px;">Notes moved from float</td></tr>
+        <tr>
+          <td>RM20</td>
+          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_20" disabled></td>
+          <td class="subtotal" id="subsalemovednote_20">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM10</td>
+          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_10" disabled></td>
+          <td class="subtotal" id="subsalemovednote_10">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM5</td>
+          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_5" disabled></td>
+          <td class="subtotal" id="subsalemovednote_5">RM0.00</td>
+        </tr>
+        <tr>
+          <td>RM1</td>
+          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_1" disabled></td>
+          <td class="subtotal" id="subsalemovednote_1">RM0.00</td>
+        </tr>
+      </tbody>
+      <tbody class="lockedSection" style="display:table-row-group;">
+        <tr><td colspan="3" class="muted" style="padding-top:10px;">Coins moved from float</td></tr>
         <tr>
           <td>RM0.50</td>
           <td><input type="number" value="0" class="saleCoinInput" id="salecoin_50" disabled></td>
@@ -381,7 +418,7 @@
         </tr>
       </tbody>
     </table>
-    <p class="muted" style="margin-top:6px;">Coins above are moved automatically from Float and can't be edited here</p>
+    <p class="muted" style="margin-top:6px;">Rows moved from Float can't be edited here</p>
 
     <div class="totalRow">
       <span>Sales total</span>
@@ -405,8 +442,11 @@ function toCents(n) {
 // ---------- state ----------
 const COIN_DENOMS = [0.05, 0.10, 0.20, 0.50];
 let movedCoins = {}; // e.g. {0.20: 1, 0.10: 1, 0.05: 1}
+let movedNotes = {}; // e.g. {10: 1, 5: 1} -- notes moved to Sale when Float goes over RM200
 let selectedComboIndex = -1;
 let currentCombos = [];
+let selectedNoteComboIndex = -1;
+let currentNoteCombos = [];
 
 // ---------- FLOAT: coins locking ----------
 function lockCoinsSection() {
@@ -439,6 +479,19 @@ function editCoins() {
   });
   movedCoins = {};
   renderMovedCoins();
+
+  // editing coins invalidates the whole float chain, so also revert any moved notes
+  [1, 5, 10, 20].forEach(v => {
+    const pcs = movedNotes[v] || 0;
+    if (pcs > 0) {
+      const input = document.getElementById("note_" + v);
+      const current = parseInt(input.value, 10) || 0;
+      input.value = current + pcs;
+    }
+  });
+  movedNotes = {};
+  renderMovedNotes();
+
   document.getElementById("comboBox").classList.remove("show");
   lockNotesSection();
   unlockCoinsSection();
@@ -499,14 +552,13 @@ function confirmCoins() {
   const piecesCents = {};
   COIN_DENOMS.forEach(d => piecesCents[toCents(d)] = pieces[d]);
 
-  currentCombos = findCombos(remainderCents, piecesCents);
+  currentCombos = findCombos(remainderCents, piecesCents, [50, 20, 10, 5]);
   selectedComboIndex = currentCombos.length ? 0 : -1;
   renderCombos(remainderCents);
 }
 
-// find distinct coin combos (respecting available piece counts) that sum to targetCents
-function findCombos(targetCents, availableCents) {
-  const denoms = [50, 20, 10, 5]; // largest first
+// find distinct combos (respecting available piece counts) that sum to targetUnits, for any denom list (largest first)
+function findCombos(targetUnits, availableUnits, denoms) {
   const results = [];
 
   function backtrack(idx, remaining, picked) {
@@ -517,7 +569,7 @@ function findCombos(targetCents, availableCents) {
     }
     if (idx >= denoms.length) return;
     const d = denoms[idx];
-    const maxUse = Math.min(Math.floor(remaining / d), availableCents[d] || 0);
+    const maxUse = Math.min(Math.floor(remaining / d), availableUnits[d] || 0);
     for (let use = maxUse; use >= 0; use--) {
       picked[d] = use;
       backtrack(idx + 1, remaining - use * d, picked);
@@ -525,7 +577,7 @@ function findCombos(targetCents, availableCents) {
     }
     delete picked[d];
   }
-  backtrack(0, targetCents, {});
+  backtrack(0, targetUnits, {});
   return results;
 }
 
@@ -594,6 +646,9 @@ function revealNotesSection() {
   [1, 5, 10, 20].forEach(v => {
     document.getElementById("note_" + v).disabled = false;
   });
+  document.getElementById("confirmNotesBtn").classList.remove("hidden");
+  document.getElementById("editNotesBtn").classList.add("hidden");
+  document.getElementById("noteComboBox").classList.remove("show");
   updateFloatTotals();
 }
 
@@ -603,7 +658,55 @@ function lockNotesSection() {
   [1, 5, 10, 20].forEach(v => {
     document.getElementById("note_" + v).disabled = true;
   });
+  document.getElementById("confirmNotesBtn").classList.add("hidden");
+  document.getElementById("editNotesBtn").classList.add("hidden");
+  document.getElementById("noteComboBox").classList.remove("show");
 }
+
+function lockConfirmedNotes() {
+  document.getElementById("notesSection").classList.add("lockedSection");
+  [1, 5, 10, 20].forEach(v => {
+    document.getElementById("note_" + v).disabled = true;
+  });
+  document.getElementById("confirmNotesBtn").classList.add("hidden");
+  document.getElementById("editNotesBtn").classList.remove("hidden");
+  document.getElementById("noteComboBox").classList.remove("show");
+}
+
+function unlockConfirmedNotes() {
+  document.getElementById("notesSection").classList.remove("lockedSection");
+  [1, 5, 10, 20].forEach(v => {
+    document.getElementById("note_" + v).disabled = false;
+  });
+  document.getElementById("confirmNotesBtn").classList.remove("hidden");
+  document.getElementById("editNotesBtn").classList.add("hidden");
+}
+
+function editNotes() {
+  [1, 5, 10, 20].forEach(v => {
+    const pcs = movedNotes[v] || 0;
+    if (pcs > 0) {
+      const input = document.getElementById("note_" + v);
+      const current = parseInt(input.value, 10) || 0;
+      input.value = current + pcs;
+    }
+  });
+  movedNotes = {};
+  renderMovedNotes();
+  unlockConfirmedNotes();
+  updateFloatTotals();
+  refreshAllRowHighlights();
+  saveState();
+}
+
+function onNoteInputChanged() {
+  updateFloatTotals();
+  document.getElementById("noteComboBox").classList.remove("show");
+}
+
+document.querySelectorAll(".noteInput").forEach(inp => {
+  inp.addEventListener("input", onNoteInputChanged);
+});
 
 function updateFloatTotals() {
   const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
@@ -629,9 +732,84 @@ function updateFloatTotals() {
   remRow.className = "infoRow " + (remaining === 0 ? "good" : remaining > 0 ? "warn" : "warn");
 }
 
-document.querySelectorAll(".noteInput").forEach(inp => {
-  inp.addEventListener("input", updateFloatTotals);
-});
+function confirmNotes() {
+  updateFloatTotals();
+  const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
+  let notesTotal = 0;
+  [1, 5, 10, 20].forEach(v => {
+    notesTotal += (parseInt(document.getElementById("note_" + v).value, 10) || 0) * v;
+  });
+  const total = Math.round(coinsTotal + notesTotal);
+  const excess = total - 200;
+
+  if (excess <= 0) {
+    lockConfirmedNotes();
+    saveState();
+    return;
+  }
+
+  const noteCounts = {};
+  [1, 5, 10, 20].forEach(v => {
+    noteCounts[v] = parseInt(document.getElementById("note_" + v).value, 10) || 0;
+  });
+  currentNoteCombos = findCombos(excess, noteCounts, [20, 10, 5, 1]);
+  selectedNoteComboIndex = currentNoteCombos.length ? 0 : -1;
+  renderNoteCombos(excess);
+}
+
+function renderNoteCombos(excess) {
+  document.getElementById("noteExcessLabel").textContent = fmt(excess);
+  const list = document.getElementById("noteComboList");
+  list.innerHTML = "";
+
+  if (currentNoteCombos.length === 0) {
+    list.innerHTML = '<p class="muted">Not enough notes counted to trim exactly ' + fmt(excess) + '. Adjust the counts.</p>';
+    document.getElementById("noteComboBox").classList.add("show");
+    return;
+  }
+
+  currentNoteCombos.forEach((combo, i) => {
+    let noteCount = 0;
+    const chips = [];
+    [20, 10, 5, 1].forEach(v => {
+      if (combo[v]) {
+        noteCount += combo[v];
+        chips.push('<span class="chip chip-note-' + v + '">RM' + v + '<span class="count">x' + combo[v] + '</span></span>');
+      }
+    });
+    const div = document.createElement("div");
+    div.className = "comboOption" + (i === selectedNoteComboIndex ? " selected" : "");
+    div.innerHTML = '<span class="chips">' + chips.join("") + '</span><span class="coinCount">' + noteCount + ' notes</span>';
+    div.onclick = () => {
+      selectedNoteComboIndex = i;
+      renderNoteCombos(excess);
+    };
+    list.appendChild(div);
+  });
+
+  document.getElementById("noteComboBox").classList.add("show");
+}
+
+function confirmNoteComboSelection() {
+  if (selectedNoteComboIndex < 0 || !currentNoteCombos[selectedNoteComboIndex]) return;
+  const combo = currentNoteCombos[selectedNoteComboIndex];
+
+  [20, 10, 5, 1].forEach(v => {
+    const use = combo[v] || 0;
+    if (use > 0) {
+      const input = document.getElementById("note_" + v);
+      const current = parseInt(input.value, 10) || 0;
+      input.value = Math.max(0, current - use);
+      movedNotes[v] = (movedNotes[v] || 0) + use;
+    }
+  });
+
+  updateFloatTotals();
+  document.getElementById("noteComboBox").classList.remove("show");
+  renderMovedNotes();
+  lockConfirmedNotes();
+  saveState();
+}
 
 // ---------- SALE ----------
 function renderMovedCoins() {
@@ -644,8 +822,18 @@ function renderMovedCoins() {
   updateSalesTotals();
 }
 
+function renderMovedNotes() {
+  [20, 10, 5, 1].forEach(v => {
+    const pcs = movedNotes[v] || 0;
+    document.getElementById("salemovednote_" + v).value = pcs;
+    document.getElementById("subsalemovednote_" + v).textContent = fmt(pcs * v);
+  });
+  updateSalesTotals();
+}
+
 function updateSalesTotals() {
   const coinsMovedTotal = COIN_DENOMS.reduce((sum, d) => sum + (movedCoins[d] || 0) * d, 0);
+  const notesMovedTotal = [1, 5, 10, 20].reduce((sum, v) => sum + (movedNotes[v] || 0) * v, 0);
   let notesTotal = 0;
   [1, 5, 10, 20, 50, 100].forEach(v => {
     const input = document.getElementById("salenote_" + v);
@@ -656,7 +844,7 @@ function updateSalesTotals() {
     cell.textContent = fmt(sub);
     cell.classList.toggle("nonzero", sub > 0);
   });
-  document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesTotal);
+  document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesMovedTotal + notesTotal);
 }
 
 document.querySelectorAll(".saleNoteInput").forEach(inp => {
@@ -670,13 +858,18 @@ function resetAll() {
 
   document.querySelectorAll(".coinInput, .noteInput, .saleNoteInput").forEach(inp => inp.value = 0);
   movedCoins = {};
+  movedNotes = {};
   currentCombos = [];
+  currentNoteCombos = [];
   selectedComboIndex = -1;
+  selectedNoteComboIndex = -1;
   document.getElementById("comboBox").classList.remove("show");
+  document.getElementById("noteComboBox").classList.remove("show");
   lockNotesSection();
   unlockCoinsSection();
   updateCoinSubtotals();
   renderMovedCoins();
+  renderMovedNotes();
   refreshAllRowHighlights();
   clearSavedState();
 }
@@ -693,7 +886,7 @@ document.querySelectorAll('input[type=number]').forEach(inp => {
 // 1. +/- stepper buttons on every editable number field
 function initSteppers() {
   document.querySelectorAll('input[type=number]').forEach(inp => {
-    if (inp.classList.contains('saleCoinInput')) return; // read-only, no steppers
+    if (inp.classList.contains('saleCoinInput') || inp.classList.contains('saleMovedNoteInput')) return; // read-only, no steppers
     if (inp.dataset.stepperInit) return;
     inp.dataset.stepperInit = "1";
 
@@ -772,27 +965,39 @@ function initRowHighlighting() {
 // 5. Copy a plain-text summary of Float + Sale to the clipboard
 function buildSummaryText() {
   const lines = [];
+
   lines.push("FLOAT");
+  lines.push("Notes:");
   [20, 10, 5, 1].forEach(v => {
     const val = parseInt(document.getElementById('note_' + v).value, 10) || 0;
-    if (val > 0) lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
+    lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
   });
+  lines.push("Coins:");
   [0.50, 0.20, 0.10, 0.05].forEach(d => {
     const val = parseInt(document.getElementById('coin_' + toCents(d)).value, 10) || 0;
-    if (val > 0) lines.push('RM' + d.toFixed(2) + ' x ' + val + ' = ' + fmt(val * d));
+    lines.push('RM' + d.toFixed(2) + ' x ' + val + ' = ' + fmt(val * d));
   });
   lines.push('Float total: ' + document.getElementById('floatGrandTotal').textContent);
   lines.push('');
-  lines.push('SALE');
+
+  lines.push("SALE");
+  lines.push("Notes:");
   [100, 50, 20, 10, 5, 1].forEach(v => {
     const val = parseInt(document.getElementById('salenote_' + v).value, 10) || 0;
-    if (val > 0) lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
+    lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
   });
+  lines.push("Notes moved from float:");
+  [20, 10, 5, 1].forEach(v => {
+    const pcs = movedNotes[v] || 0;
+    lines.push('RM' + v + ' x ' + pcs + ' = ' + fmt(pcs * v));
+  });
+  lines.push("Coins moved from float:");
   [0.50, 0.20, 0.10, 0.05].forEach(d => {
     const pcs = movedCoins[d] || 0;
-    if (pcs > 0) lines.push('RM' + d.toFixed(2) + ' x ' + pcs + ' = ' + fmt(pcs * d) + ' (from float)');
+    lines.push('RM' + d.toFixed(2) + ' x ' + pcs + ' = ' + fmt(pcs * d));
   });
   lines.push('Sales total: ' + document.getElementById('salesGrandTotal').textContent);
+
   return lines.join('\n');
 }
 
@@ -833,8 +1038,9 @@ function saveState() {
     notes: {},
     saleNotes: {},
     movedCoins,
-    notesVisible: !document.getElementById("notesSection").classList.contains("lockedSection"),
-    coinsLocked: document.getElementById("coinsSection").classList.contains("lockedSection")
+    movedNotes,
+    coinsLocked: document.getElementById("coinsSection").classList.contains("lockedSection"),
+    notesConfirmed: !document.getElementById("editNotesBtn").classList.contains("hidden")
   };
   COIN_DENOMS.forEach(d => {
     state.coins[toCents(d)] = document.getElementById("coin_" + toCents(d)).value;
@@ -878,15 +1084,16 @@ function loadState() {
     movedCoins = {};
     Object.keys(state.movedCoins).forEach(k => movedCoins[k] = state.movedCoins[k]);
   }
-  if (state.notesVisible) {
-    document.getElementById("notesSection").classList.remove("lockedSection");
-    document.getElementById("lockNotice").classList.add("hidden");
-    [1, 5, 10, 20].forEach(v => {
-      document.getElementById("note_" + v).disabled = false;
-    });
+  if (state.movedNotes) {
+    movedNotes = {};
+    Object.keys(state.movedNotes).forEach(k => movedNotes[k] = state.movedNotes[k]);
   }
   if (state.coinsLocked) {
     lockCoinsSection();
+    revealNotesSection();
+    if (state.notesConfirmed) {
+      lockConfirmedNotes();
+    }
   }
 }
 
@@ -900,6 +1107,7 @@ function clearSavedState() {
 loadState();
 updateCoinSubtotals();
 renderMovedCoins();
+renderMovedNotes();
 updateFloatTotals();
 updateSalesTotals();
 initSteppers();
