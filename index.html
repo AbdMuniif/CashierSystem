@@ -122,7 +122,7 @@
   </div>
 
   <!-- ============ EXCHANGE WITH SV ============ -->
-  <div class="card">
+  <div class="card" id="exchangeCard">
     <h2>Exchange with SV</h2>
     <p class="sub">Swap surplus float notes for a denomination you're short on. RM10 exchanges in RM100 batches; RM1/RM5 exchange in RM20 or RM50 batches.</p>
 
@@ -521,10 +521,12 @@ function confirmNoteComboSelection() {
 function checkFloatMinimums() {
   const box = document.getElementById("minWarningBox");
   const lines = [];
+  const shortages = [];
   Object.keys(FLOAT_MIN).map(Number).sort((a, b) => b - a).forEach(v => {
     const pcs = parseInt(document.getElementById("note_" + v).value, 10) || 0;
     const min = FLOAT_MIN[v];
     if (pcs < min) {
+      shortages.push(v);
       lines.push('<div class="line"><span class="short">RM' + v + ': ' + pcs + '/' + min + ' pcs — short by ' + (min - pcs) + '</span></div>');
     } else if (pcs > min * 2) {
       lines.push('<div class="line"><span class="surplus">RM' + v + ': ' + pcs + ' pcs — well above the ' + min + ' minimum, consider exchanging some</span></div>');
@@ -536,6 +538,21 @@ function checkFloatMinimums() {
   } else {
     box.innerHTML = '<div class="line" style="font-weight:bold;color:#b35c00;">Denomination check</div>' + lines.join("");
     box.classList.remove("hidden");
+  }
+
+  if (shortages.length > 0) {
+    autoOpenExchangeForShortage(shortages);
+  }
+}
+
+function autoOpenExchangeForShortage(shortages) {
+  const exchangeCard = document.getElementById("exchangeCard");
+  if (exchangeCard) exchangeCard.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  if (shortages.length === 1) {
+    const target = shortages[0];
+    const btn = document.querySelector('.exchangeTargetBtn[data-target="' + target + '"]');
+    if (btn) btn.click();
   }
 }
 
