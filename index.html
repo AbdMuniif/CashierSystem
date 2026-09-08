@@ -7,233 +7,61 @@
 <style>
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #f2f3f5;
-    margin: 0;
-    padding: 16px;
-    color: #222;
-  }
-  h1 {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-  .wrap {
-    max-width: 520px;
-    margin: 0 auto;
-    width: 100%;
-  }
-  .card {
-    background: #fff;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    padding: 16px;
-    margin-bottom: 20px;
-  }
-  .card h2 {
-    font-size: 17px;
-    margin: 0 0 4px;
-  }
-  .card .sub {
-    font-size: 12px;
-    color: #777;
-    margin: 0 0 14px;
-  }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-    table-layout: fixed;
-  }
-  th {
-    text-align: left;
-    font-size: 12px;
-    color: #777;
-    font-weight: normal;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #eee;
-  }
+  body { font-family: Arial, Helvetica, sans-serif; background: #f2f3f5; margin: 0; padding: 16px; color: #222; }
+  h1 { text-align: center; font-size: 20px; margin-bottom: 20px; }
+  .wrap { max-width: 520px; margin: 0 auto; width: 100%; }
+  .card { background: #fff; border-radius: 10px; border: 1px solid #ddd; padding: 16px; margin-bottom: 20px; }
+  .card h2 { font-size: 17px; margin: 0 0 4px; }
+  .card .sub { font-size: 12px; color: #777; margin: 0 0 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+  th { text-align: left; font-size: 12px; color: #777; font-weight: normal; padding-bottom: 6px; border-bottom: 1px solid #eee; }
   th:last-child, td:last-child { text-align: right; }
   td { padding: 6px 2px; vertical-align: middle; }
-  td:first-child { width: 30%; }
-  td:nth-child(2) { width: 38%; }
+  td:first-child { width: 26%; }
+  td:nth-child(2) { width: 42%; }
   td:last-child { width: 32%; overflow-wrap: break-word; font-size: 13px; }
-  input[type=number] {
-    width: 100%;
-    max-width: 90px;
-    padding: 8px 6px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-  }
-  .totalRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid #ddd;
-    font-weight: bold;
-  }
+  input[type=number] { width: 100%; max-width: 90px; padding: 8px 6px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+  .totalRow { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding-top: 10px; border-top: 1px solid #ddd; font-weight: bold; }
   .totalRow span:last-child { font-size: 18px; }
-  .infoRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-top: 8px;
-    font-size: 13px;
-  }
+  .infoRow { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; font-size: 13px; }
   .infoRow.good { color: #1a7f37; }
   .infoRow.warn { color: #b35c00; }
-  button {
-    margin-top: 14px;
-    width: 100%;
-    padding: 10px;
-    background: #2f6fed;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-  }
+  button { margin-top: 14px; width: 100%; padding: 10px; background: #2f6fed; color: #fff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
   button:hover { background: #255bc4; }
-  button.secondary {
-    background: #fff;
-    color: #333;
-    border: 1px solid #ccc;
-  }
+  button.secondary { background: #fff; color: #333; border: 1px solid #ccc; }
   button.secondary:hover { background: #f5f5f5; }
-  .comboBox {
-    margin-top: 14px;
-    display: none;
-  }
+  button.small { width: auto; flex: 1; margin-top: 0; padding: 10px 8px; }
+  button.small.active { background: #2f6fed; color: #fff; border-color: #2f6fed; }
+  .btnRow { display: flex; gap: 8px; margin-bottom: 12px; }
+  .comboBox { margin-top: 14px; display: none; }
   .comboBox.show { display: block; }
-  .comboOption {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px 10px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .comboOption .chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: bold;
-    color: #fff;
-  }
-  .chip .count {
-    background: rgba(255,255,255,0.35);
-    border-radius: 999px;
-    padding: 1px 7px;
-    font-size: 11px;
-  }
-  .chip-50 { background: #6a4fb3; }
-  .chip-20 { background: #2f9e6f; }
-  .chip-10 { background: #d68a1f; }
-  .chip-5  { background: #cf4b4b; }
-  .chip-note-20 { background: #6a4fb3; }
-  .chip-note-10 { background: #2f9e6f; }
-  .chip-note-5  { background: #d68a1f; }
-  .chip-note-1  { background: #2f6fed; }
-  @media (max-width: 380px) {
-    h1 { font-size: 18px; }
-    .card { padding: 14px 12px; }
-    table { font-size: 13px; }
-    input[type=number] { max-width: 72px; padding: 7px 5px; }
-    .totalRow span:last-child { font-size: 16px; }
-  }
-  .comboOption.selected {
-    border-color: #2f6fed;
-    background: #eaf0fe;
-    box-shadow: 0 0 0 1px #2f6fed inset;
-  }
+  .comboOption { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px 10px; border: 2px solid #ddd; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; cursor: pointer; font-size: 13px; }
+  .comboOption .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: bold; color: #fff; }
+  .chip .count { background: rgba(255,255,255,0.35); border-radius: 999px; padding: 1px 7px; font-size: 11px; }
+  .chip-50 { background: #6a4fb3; } .chip-20 { background: #2f9e6f; } .chip-10 { background: #d68a1f; } .chip-5 { background: #cf4b4b; }
+  .chip-note-10 { background: #2f9e6f; } .chip-note-5 { background: #d68a1f; } .chip-note-1 { background: #2f6fed; }
+  .comboOption.selected { border-color: #2f6fed; background: #eaf0fe; box-shadow: 0 0 0 1px #2f6fed inset; }
   .comboOption .coinCount { color: #777; font-size: 12px; white-space: nowrap; }
   .hidden { display: none; }
-  .movedList {
-    background: #f7f7f8;
-    border-radius: 6px;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    font-size: 13px;
-  }
-  .movedList .row {
-    display: flex;
-    justify-content: space-between;
-    padding: 2px 0;
-  }
-  .movedList .row.total {
-    border-top: 1px solid #ddd;
-    margin-top: 6px;
-    padding-top: 6px;
-    font-weight: bold;
-  }
   .muted { color: #999; font-size: 12px; }
-  .lockedSection {
-    opacity: 0.45;
-    pointer-events: none;
-    position: relative;
-  }
-  .lockNotice {
-    font-size: 12px;
-    color: #b35c00;
-    background: #fff6e8;
-    border: 1px solid #f0d6a8;
-    border-radius: 6px;
-    padding: 8px 10px;
-    margin-bottom: 10px;
-    pointer-events: none;
-  }
+  .lockedSection { opacity: 0.45; pointer-events: none; position: relative; }
+  .lockNotice { font-size: 12px; color: #b35c00; background: #fff6e8; border: 1px solid #f0d6a8; border-radius: 6px; padding: 8px 10px; margin-bottom: 10px; pointer-events: none; }
   .lockNotice.hidden { display: none; }
-  .stepperWrap {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  .stepBtn {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    padding: 0;
-    margin: 0;
-    border-radius: 6px;
-    font-size: 16px;
-    line-height: 1;
-    background: #eef1f5;
-    color: #333;
-    border: 1px solid #ccc;
-    flex-shrink: 0;
-  }
+  .warnBox { font-size: 12px; color: #b35c00; background: #fff6e8; border: 1px solid #f0d6a8; border-radius: 6px; padding: 10px 12px; margin-top: 12px; }
+  .warnBox .line { margin: 3px 0; }
+  .warnBox .short { color: #a32d2d; font-weight: bold; }
+  .warnBox .surplus { color: #1a7f37; font-weight: bold; }
+  .stepperWrap { display: flex; align-items: center; gap: 4px; }
+  .stepBtn { width: 30px; height: 30px; min-width: 30px; padding: 0; margin: 0; border-radius: 6px; font-size: 16px; line-height: 1; background: #eef1f5; color: #333; border: 1px solid #ccc; flex-shrink: 0; }
   .stepBtn:hover { background: #e2e6ec; }
-  .stepperWrap input[type=number] {
-    flex: 1;
-    min-width: 0;
-    max-width: none;
-    text-align: center;
-  }
+  .stepperWrap input[type=number] { flex: 1; min-width: 0; max-width: none; text-align: center; }
   tr.filledRow { background: #f1fbf5; }
-  .subtotal {
-    font-weight: 600;
-    font-size: 14px !important;
-    color: #222;
-  }
+  .subtotal { font-weight: 600; font-size: 14px !important; color: #222; }
   .subtotal.nonzero { color: #1a7f37; }
   @media (max-width: 380px) {
+    h1 { font-size: 18px; } .card { padding: 14px 12px; } table { font-size: 13px; }
+    input[type=number] { max-width: 72px; padding: 7px 5px; } .totalRow span:last-child { font-size: 16px; }
     .stepBtn { width: 26px; height: 26px; min-width: 26px; font-size: 14px; }
   }
 </style>
@@ -245,63 +73,29 @@
   <!-- ============ FLOAT FORM ============ -->
   <div class="card">
     <h2>Float</h2>
-    <p class="sub">Target float: RM200.00</p>
+    <p class="sub">Target float: RM200.00. Enter everything you have — the system works out what stays in Float.</p>
 
-    <p class="lockNotice" id="lockNotice">Confirm coins first to unlock RM1 / RM5 / RM10 / RM20</p>
+    <p class="lockNotice" id="lockNotice">Confirm coins first to unlock notes</p>
 
     <table>
       <tr><th>Denom</th><th>Pieces</th><th>Subtotal</th></tr>
       <tbody id="notesSection" class="lockedSection">
-        <tr>
-          <td>RM20</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="20" id="note_20" disabled></td>
-          <td class="subtotal" id="subnote_20">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM10</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="10" id="note_10" disabled></td>
-          <td class="subtotal" id="subnote_10">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM5</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="5" id="note_5" disabled></td>
-          <td class="subtotal" id="subnote_5">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM1</td>
-          <td><input type="number" min="0" value="0" class="noteInput" data-value="1" id="note_1" disabled></td>
-          <td class="subtotal" id="subnote_1">RM0.00</td>
-        </tr>
+        <tr><td>RM100</td><td><input type="number" min="0" value="0" class="noteInput" id="note_100" disabled></td><td class="subtotal" id="subnote_100">RM0.00</td></tr>
+        <tr><td>RM50</td><td><input type="number" min="0" value="0" class="noteInput" id="note_50" disabled></td><td class="subtotal" id="subnote_50">RM0.00</td></tr>
+        <tr><td>RM20</td><td><input type="number" min="0" value="0" class="noteInput" id="note_20" disabled></td><td class="subtotal" id="subnote_20">RM0.00</td></tr>
+        <tr><td>RM10</td><td><input type="number" min="0" value="0" class="noteInput" id="note_10" disabled></td><td class="subtotal" id="subnote_10">RM0.00</td></tr>
+        <tr><td>RM5</td><td><input type="number" min="0" value="0" class="noteInput" id="note_5" disabled></td><td class="subtotal" id="subnote_5">RM0.00</td></tr>
+        <tr><td>RM1</td><td><input type="number" min="0" value="0" class="noteInput" id="note_1" disabled></td><td class="subtotal" id="subnote_1">RM0.00</td></tr>
       </tbody>
       <tbody id="coinsSection">
-        <tr>
-          <td>RM0.50</td>
-          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.50" id="coin_50"></td>
-          <td class="subtotal" id="sub_50">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.20</td>
-          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.20" id="coin_20"></td>
-          <td class="subtotal" id="sub_20">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.10</td>
-          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.10" id="coin_10"></td>
-          <td class="subtotal" id="sub_10">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.05</td>
-          <td><input type="number" min="0" value="0" class="coinInput" data-value="0.05" id="coin_5"></td>
-          <td class="subtotal" id="sub_5">RM0.00</td>
-        </tr>
+        <tr><td>RM0.50</td><td><input type="number" min="0" value="0" class="coinInput" id="coin_50"></td><td class="subtotal" id="sub_50">RM0.00</td></tr>
+        <tr><td>RM0.20</td><td><input type="number" min="0" value="0" class="coinInput" id="coin_20"></td><td class="subtotal" id="sub_20">RM0.00</td></tr>
+        <tr><td>RM0.10</td><td><input type="number" min="0" value="0" class="coinInput" id="coin_10"></td><td class="subtotal" id="sub_10">RM0.00</td></tr>
+        <tr><td>RM0.05</td><td><input type="number" min="0" value="0" class="coinInput" id="coin_5"></td><td class="subtotal" id="sub_5">RM0.00</td></tr>
       </tbody>
     </table>
 
-    <div class="infoRow">
-      <span>Coins subtotal</span>
-      <span id="coinsTotal">RM0.00</span>
-    </div>
-
+    <div class="infoRow"><span>Coins subtotal</span><span id="coinsTotal">RM0.00</span></div>
     <button id="confirmCoinsBtn" onclick="confirmCoins()">Confirm coins</button>
     <button id="editCoinsBtn" class="secondary hidden" onclick="editCoins()">Edit coins</button>
 
@@ -311,18 +105,9 @@
       <button onclick="confirmComboSelection()">Confirm deduction</button>
     </div>
 
-    <div class="infoRow">
-      <span>Notes subtotal</span>
-      <span id="notesTotal">RM0.00</span>
-    </div>
-    <div class="infoRow" id="remainingRow">
-      <span>Remaining to RM200</span>
-      <span id="remainingToTarget">RM154.00</span>
-    </div>
-    <div class="totalRow">
-      <span>Float total</span>
-      <span id="floatGrandTotal">RM0.00</span>
-    </div>
+    <div class="infoRow"><span>Notes subtotal (eligible: RM10/5/1)</span><span id="notesTotal">RM0.00</span></div>
+    <div class="infoRow" id="remainingRow"><span>Remaining to RM200</span><span id="remainingToTarget">RM200.00</span></div>
+    <div class="totalRow"><span>Float total</span><span id="floatGrandTotal">RM0.00</span></div>
 
     <button id="confirmNotesBtn" class="hidden" onclick="confirmNotes()">Confirm notes</button>
     <button id="editNotesBtn" class="secondary hidden" onclick="editNotes()">Edit notes</button>
@@ -332,98 +117,57 @@
       <div id="noteComboList"></div>
       <button onclick="confirmNoteComboSelection()">Confirm deduction</button>
     </div>
+
+    <div id="minWarningBox" class="warnBox hidden"></div>
+  </div>
+
+  <!-- ============ EXCHANGE WITH SV ============ -->
+  <div class="card">
+    <h2>Exchange with SV</h2>
+    <p class="sub">Swap surplus float notes for a denomination you're short on. RM10 exchanges in RM100 batches; RM1/RM5 exchange in RM20 or RM50 batches.</p>
+
+    <p class="muted" style="margin-bottom:6px;">I want to receive:</p>
+    <div class="btnRow">
+      <button type="button" class="secondary small exchangeTargetBtn" data-target="1">RM1</button>
+      <button type="button" class="secondary small exchangeTargetBtn" data-target="5">RM5</button>
+      <button type="button" class="secondary small exchangeTargetBtn" data-target="10">RM10</button>
+    </div>
+
+    <div id="exchangeBatchArea" class="hidden">
+      <p class="muted" style="margin-bottom:6px;">Batch size:</p>
+      <div class="btnRow" id="exchangeBatchButtons"></div>
+    </div>
+
+    <div id="exchangeComboArea"></div>
   </div>
 
   <!-- ============ SALE FORM ============ -->
   <div class="card">
     <h2>Sale</h2>
-    <p class="sub">No target — totals whatever is counted</p>
+    <p class="sub">Automatically made up of everything not needed for Float</p>
 
     <table>
       <tr><th>Denom</th><th>Pieces</th><th>Subtotal</th></tr>
-      <tr>
-        <td>RM100</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="100" id="salenote_100"></td>
-        <td class="subtotal" id="subsalenote_100">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM50</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="50" id="salenote_50"></td>
-        <td class="subtotal" id="subsalenote_50">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM20</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="20" id="salenote_20"></td>
-        <td class="subtotal" id="subsalenote_20">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM10</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="10" id="salenote_10"></td>
-        <td class="subtotal" id="subsalenote_10">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM5</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="5" id="salenote_5"></td>
-        <td class="subtotal" id="subsalenote_5">RM0.00</td>
-      </tr>
-      <tr>
-        <td>RM1</td>
-        <td><input type="number" min="0" value="0" class="saleNoteInput" data-value="1" id="salenote_1"></td>
-        <td class="subtotal" id="subsalenote_1">RM0.00</td>
-      </tr>
       <tbody class="lockedSection" style="display:table-row-group;">
         <tr><td colspan="3" class="muted" style="padding-top:10px;">Notes moved from float</td></tr>
-        <tr>
-          <td>RM20</td>
-          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_20" disabled></td>
-          <td class="subtotal" id="subsalemovednote_20">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM10</td>
-          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_10" disabled></td>
-          <td class="subtotal" id="subsalemovednote_10">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM5</td>
-          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_5" disabled></td>
-          <td class="subtotal" id="subsalemovednote_5">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM1</td>
-          <td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_1" disabled></td>
-          <td class="subtotal" id="subsalemovednote_1">RM0.00</td>
-        </tr>
+        <tr><td>RM100</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_100" disabled></td><td class="subtotal" id="subsalemovednote_100">RM0.00</td></tr>
+        <tr><td>RM50</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_50" disabled></td><td class="subtotal" id="subsalemovednote_50">RM0.00</td></tr>
+        <tr><td>RM20</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_20" disabled></td><td class="subtotal" id="subsalemovednote_20">RM0.00</td></tr>
+        <tr><td>RM10</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_10" disabled></td><td class="subtotal" id="subsalemovednote_10">RM0.00</td></tr>
+        <tr><td>RM5</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_5" disabled></td><td class="subtotal" id="subsalemovednote_5">RM0.00</td></tr>
+        <tr><td>RM1</td><td><input type="number" value="0" class="saleMovedNoteInput" id="salemovednote_1" disabled></td><td class="subtotal" id="subsalemovednote_1">RM0.00</td></tr>
       </tbody>
       <tbody class="lockedSection" style="display:table-row-group;">
         <tr><td colspan="3" class="muted" style="padding-top:10px;">Coins moved from float</td></tr>
-        <tr>
-          <td>RM0.50</td>
-          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_50" disabled></td>
-          <td class="subtotal" id="subsalecoin_50">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.20</td>
-          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_20" disabled></td>
-          <td class="subtotal" id="subsalecoin_20">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.10</td>
-          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_10" disabled></td>
-          <td class="subtotal" id="subsalecoin_10">RM0.00</td>
-        </tr>
-        <tr>
-          <td>RM0.05</td>
-          <td><input type="number" value="0" class="saleCoinInput" id="salecoin_5" disabled></td>
-          <td class="subtotal" id="subsalecoin_5">RM0.00</td>
-        </tr>
+        <tr><td>RM0.50</td><td><input type="number" value="0" class="saleCoinInput" id="salecoin_50" disabled></td><td class="subtotal" id="subsalecoin_50">RM0.00</td></tr>
+        <tr><td>RM0.20</td><td><input type="number" value="0" class="saleCoinInput" id="salecoin_20" disabled></td><td class="subtotal" id="subsalecoin_20">RM0.00</td></tr>
+        <tr><td>RM0.10</td><td><input type="number" value="0" class="saleCoinInput" id="salecoin_10" disabled></td><td class="subtotal" id="subsalecoin_10">RM0.00</td></tr>
+        <tr><td>RM0.05</td><td><input type="number" value="0" class="saleCoinInput" id="salecoin_5" disabled></td><td class="subtotal" id="subsalecoin_5">RM0.00</td></tr>
       </tbody>
     </table>
-    <p class="muted" style="margin-top:6px;">Rows moved from Float can't be edited here</p>
+    <p class="muted" style="margin-top:6px;">All rows here are derived automatically and can't be edited directly</p>
 
-    <div class="totalRow">
-      <span>Sales total</span>
-      <span id="salesGrandTotal">RM0.00</span>
-    </div>
+    <div class="totalRow"><span>Sales total</span><span id="salesGrandTotal">RM0.00</span></div>
   </div>
 
   <button class="secondary" onclick="resetAll()">Reset all</button>
@@ -432,80 +176,50 @@
 
 <script>
 // ---------- helpers ----------
-function fmt(n) {
-  return "RM" + (Math.round(n * 100) / 100).toFixed(2);
-}
-function toCents(n) {
-  return Math.round(n * 100);
-}
+function fmt(n) { return "RM" + (Math.round(n * 100) / 100).toFixed(2); }
+function toCents(n) { return Math.round(n * 100); }
 
 // ---------- state ----------
 const COIN_DENOMS = [0.05, 0.10, 0.20, 0.50];
-let movedCoins = {}; // e.g. {0.20: 1, 0.10: 1, 0.05: 1}
-let movedNotes = {}; // e.g. {10: 1, 5: 1} -- notes moved to Sale when Float goes over RM200
-let selectedComboIndex = -1;
-let currentCombos = [];
-let selectedNoteComboIndex = -1;
-let currentNoteCombos = [];
+const NOTE_ALL = [100, 50, 20, 10, 5, 1];
+const NOTE_ELIGIBLE = [10, 5, 1];
+const NOTE_SWEEP = [100, 50, 20];
+const FLOAT_MIN = { 10: 5, 5: 15, 1: 30 };
 
-// ---------- FLOAT: coins locking ----------
-function lockCoinsSection() {
-  document.getElementById("coinsSection").classList.add("lockedSection");
-  COIN_DENOMS.forEach(d => {
-    document.getElementById("coin_" + toCents(d)).disabled = true;
-  });
-  document.getElementById("confirmCoinsBtn").classList.add("hidden");
-  document.getElementById("editCoinsBtn").classList.remove("hidden");
-}
+let movedCoins = {};
+let movedNotes = {};
+let selectedComboIndex = -1, currentCombos = [];
+let selectedNoteComboIndex = -1, currentNoteCombos = [];
+let exchangeTarget = null;
+let exchangeBatchValue = null;
+let currentExchangeCombos = [];
+let selectedExchangeComboIndex = -1;
 
-function unlockCoinsSection() {
-  document.getElementById("coinsSection").classList.remove("lockedSection");
-  COIN_DENOMS.forEach(d => {
-    document.getElementById("coin_" + toCents(d)).disabled = false;
-  });
-  document.getElementById("confirmCoinsBtn").classList.remove("hidden");
-  document.getElementById("editCoinsBtn").classList.add("hidden");
-}
-
-function editCoins() {
-  // put back any coins that were previously moved to Sale, so the field shows the true total again
-  COIN_DENOMS.forEach(d => {
-    const pcs = movedCoins[d] || 0;
-    if (pcs > 0) {
-      const input = document.getElementById("coin_" + toCents(d));
-      const current = parseInt(input.value, 10) || 0;
-      input.value = current + pcs;
+// ---------- generic combo finder ----------
+function findCombos(targetUnits, availableUnits, denoms) {
+  const results = [];
+  function backtrack(idx, remaining, picked) {
+    if (results.length >= 6) return;
+    if (remaining === 0) { results.push({ ...picked }); return; }
+    if (idx >= denoms.length) return;
+    const d = denoms[idx];
+    const maxUse = Math.min(Math.floor(remaining / d), availableUnits[d] || 0);
+    for (let use = maxUse; use >= 0; use--) {
+      picked[d] = use;
+      backtrack(idx + 1, remaining - use * d, picked);
+      if (results.length >= 6) { delete picked[d]; return; }
     }
-  });
-  movedCoins = {};
-  renderMovedCoins();
-
-  // editing coins invalidates the whole float chain, so also revert any moved notes
-  [1, 5, 10, 20].forEach(v => {
-    const pcs = movedNotes[v] || 0;
-    if (pcs > 0) {
-      const input = document.getElementById("note_" + v);
-      const current = parseInt(input.value, 10) || 0;
-      input.value = current + pcs;
-    }
-  });
-  movedNotes = {};
-  renderMovedNotes();
-
-  document.getElementById("comboBox").classList.remove("show");
-  lockNotesSection();
-  unlockCoinsSection();
-  updateCoinSubtotals();
-  refreshAllRowHighlights();
-  saveState();
+    delete picked[d];
+  }
+  backtrack(0, targetUnits, {});
+  return results;
 }
 
 // ---------- FLOAT: coins ----------
 function coinPieces() {
   const out = {};
   COIN_DENOMS.forEach(d => {
-    const id = "coin_" + toCents(d);
-    const v = parseInt(document.getElementById(id).value, 10);
+    const v = parseInt(document.getElementById("coin_" + toCents(d)).value, 10);
     out[d] = isNaN(v) || v < 0 ? 0 : v;
   });
   return out;
@@ -526,13 +240,50 @@ function updateCoinSubtotals() {
   return total;
 }
 
-function onCoinInputChanged() {
-  updateCoinSubtotals();
+function onCoinInputChanged() { updateCoinSubtotals(); }
+document.querySelectorAll(".coinInput").forEach(inp => inp.addEventListener("input", onCoinInputChanged));
+
+function lockCoinsSection() {
+  document.getElementById("coinsSection").classList.add("lockedSection");
+  COIN_DENOMS.forEach(d => document.getElementById("coin_" + toCents(d)).disabled = true);
+  document.getElementById("confirmCoinsBtn").classList.add("hidden");
+  document.getElementById("editCoinsBtn").classList.remove("hidden");
+}
+function unlockCoinsSection() {
+  document.getElementById("coinsSection").classList.remove("lockedSection");
+  COIN_DENOMS.forEach(d => document.getElementById("coin_" + toCents(d)).disabled = false);
+  document.getElementById("confirmCoinsBtn").classList.remove("hidden");
+  document.getElementById("editCoinsBtn").classList.add("hidden");
 }
 
-document.querySelectorAll(".coinInput").forEach(inp => {
-  inp.addEventListener("input", onCoinInputChanged);
-});
+function editCoins() {
+  COIN_DENOMS.forEach(d => {
+    const pcs = movedCoins[d] || 0;
+    if (pcs > 0) {
+      const input = document.getElementById("coin_" + toCents(d));
+      input.value = (parseInt(input.value, 10) || 0) + pcs;
+    }
+  });
+  movedCoins = {};
+  renderMovedCoins();
+  NOTE_ALL.forEach(v => {
+    const pcs = movedNotes[v] || 0;
+    if (pcs > 0) {
+      const input = document.getElementById("note_" + v);
+      input.value = (parseInt(input.value, 10) || 0) + pcs;
+    }
+  });
+  movedNotes = {};
+  renderMovedNotes();
+  document.getElementById("comboBox").classList.remove("show");
+  document.getElementById("noteComboBox").classList.remove("show");
+  document.getElementById("minWarningBox").classList.add("hidden");
+  lockNotesSection();
+  unlockCoinsSection();
+  updateCoinSubtotals();
+  refreshAllRowHighlights();
+  saveState();
+}
 
 function confirmCoins() {
   const total = updateCoinSubtotals();
@@ -551,86 +302,47 @@ function confirmCoins() {
   const pieces = coinPieces();
   const piecesCents = {};
   COIN_DENOMS.forEach(d => piecesCents[toCents(d)] = pieces[d]);
-
   currentCombos = findCombos(remainderCents, piecesCents, [50, 20, 10, 5]);
   selectedComboIndex = currentCombos.length ? 0 : -1;
   renderCombos(remainderCents);
-}
-
-// find distinct combos (respecting available piece counts) that sum to targetUnits, for any denom list (largest first)
-function findCombos(targetUnits, availableUnits, denoms) {
-  const results = [];
-
-  function backtrack(idx, remaining, picked) {
-    if (results.length >= 6) return;
-    if (remaining === 0) {
-      results.push({ ...picked });
-      return;
-    }
-    if (idx >= denoms.length) return;
-    const d = denoms[idx];
-    const maxUse = Math.min(Math.floor(remaining / d), availableUnits[d] || 0);
-    for (let use = maxUse; use >= 0; use--) {
-      picked[d] = use;
-      backtrack(idx + 1, remaining - use * d, picked);
-      if (results.length >= 6) { delete picked[d]; return; }
-    }
-    delete picked[d];
-  }
-  backtrack(0, targetUnits, {});
-  return results;
 }
 
 function renderCombos(remainderCents) {
   document.getElementById("remainderLabel").textContent = fmt(remainderCents / 100);
   const list = document.getElementById("comboList");
   list.innerHTML = "";
-
   if (currentCombos.length === 0) {
     list.innerHTML = '<p class="muted">Not enough coins entered to make this remainder. Add more pieces or adjust counts.</p>';
     document.getElementById("comboBox").classList.add("show");
     return;
   }
-
   currentCombos.forEach((combo, i) => {
     let coinCount = 0;
     const chips = [];
     [50, 20, 10, 5].forEach(d => {
-      if (combo[d]) {
-        coinCount += combo[d];
-        chips.push('<span class="chip chip-' + d + '">RM' + (d / 100).toFixed(2) + '<span class="count">x' + combo[d] + '</span></span>');
-      }
+      if (combo[d]) { coinCount += combo[d]; chips.push('<span class="chip chip-' + d + '">RM' + (d / 100).toFixed(2) + '<span class="count">x' + combo[d] + '</span></span>'); }
     });
     const div = document.createElement("div");
     div.className = "comboOption" + (i === selectedComboIndex ? " selected" : "");
     div.innerHTML = '<span class="chips">' + chips.join("") + '</span><span class="coinCount">' + coinCount + ' coins</span>';
-    div.onclick = () => {
-      selectedComboIndex = i;
-      renderCombos(remainderCents);
-    };
+    div.onclick = () => { selectedComboIndex = i; renderCombos(remainderCents); };
     list.appendChild(div);
   });
-
   document.getElementById("comboBox").classList.add("show");
 }
 
 function confirmComboSelection() {
   if (selectedComboIndex < 0 || !currentCombos[selectedComboIndex]) return;
   const combo = currentCombos[selectedComboIndex];
-
-  // deduct chosen combo from float coin inputs, add to movedCoins
   [50, 20, 10, 5].forEach(dCents => {
     const use = combo[dCents] || 0;
     if (use > 0) {
       const d = dCents / 100;
-      const id = "coin_" + dCents;
-      const input = document.getElementById(id);
-      const current = parseInt(input.value, 10) || 0;
-      input.value = Math.max(0, current - use);
+      const input = document.getElementById("coin_" + dCents);
+      input.value = Math.max(0, (parseInt(input.value, 10) || 0) - use);
       movedCoins[d] = (movedCoins[d] || 0) + use;
     }
   });
-
   updateCoinSubtotals();
   document.getElementById("comboBox").classList.remove("show");
   renderMovedCoins();
@@ -643,9 +355,7 @@ function confirmComboSelection() {
 function revealNotesSection() {
   document.getElementById("notesSection").classList.remove("lockedSection");
   document.getElementById("lockNotice").classList.add("hidden");
-  [1, 5, 10, 20].forEach(v => {
-    document.getElementById("note_" + v).disabled = false;
-  });
+  NOTE_ALL.forEach(v => document.getElementById("note_" + v).disabled = false);
   document.getElementById("confirmNotesBtn").classList.remove("hidden");
   document.getElementById("editNotesBtn").classList.add("hidden");
   document.getElementById("noteComboBox").classList.remove("show");
@@ -655,9 +365,7 @@ function revealNotesSection() {
 function lockNotesSection() {
   document.getElementById("notesSection").classList.add("lockedSection");
   document.getElementById("lockNotice").classList.remove("hidden");
-  [1, 5, 10, 20].forEach(v => {
-    document.getElementById("note_" + v).disabled = true;
-  });
+  NOTE_ALL.forEach(v => document.getElementById("note_" + v).disabled = true);
   document.getElementById("confirmNotesBtn").classList.add("hidden");
   document.getElementById("editNotesBtn").classList.add("hidden");
   document.getElementById("noteComboBox").classList.remove("show");
@@ -665,30 +373,27 @@ function lockNotesSection() {
 
 function lockConfirmedNotes() {
   document.getElementById("notesSection").classList.add("lockedSection");
-  [1, 5, 10, 20].forEach(v => {
-    document.getElementById("note_" + v).disabled = true;
-  });
+  NOTE_ALL.forEach(v => document.getElementById("note_" + v).disabled = true);
   document.getElementById("confirmNotesBtn").classList.add("hidden");
   document.getElementById("editNotesBtn").classList.remove("hidden");
   document.getElementById("noteComboBox").classList.remove("show");
+  checkFloatMinimums();
 }
 
 function unlockConfirmedNotes() {
   document.getElementById("notesSection").classList.remove("lockedSection");
-  [1, 5, 10, 20].forEach(v => {
-    document.getElementById("note_" + v).disabled = false;
-  });
+  NOTE_ALL.forEach(v => document.getElementById("note_" + v).disabled = false);
   document.getElementById("confirmNotesBtn").classList.remove("hidden");
   document.getElementById("editNotesBtn").classList.add("hidden");
+  document.getElementById("minWarningBox").classList.add("hidden");
 }
 
 function editNotes() {
-  [1, 5, 10, 20].forEach(v => {
+  NOTE_ALL.forEach(v => {
     const pcs = movedNotes[v] || 0;
     if (pcs > 0) {
       const input = document.getElementById("note_" + v);
-      const current = parseInt(input.value, 10) || 0;
-      input.value = current + pcs;
+      input.value = (parseInt(input.value, 10) || 0) + pcs;
     }
   });
   movedNotes = {};
@@ -703,50 +408,53 @@ function onNoteInputChanged() {
   updateFloatTotals();
   document.getElementById("noteComboBox").classList.remove("show");
 }
-
-document.querySelectorAll(".noteInput").forEach(inp => {
-  inp.addEventListener("input", onNoteInputChanged);
-});
+document.querySelectorAll(".noteInput").forEach(inp => inp.addEventListener("input", onNoteInputChanged));
 
 function updateFloatTotals() {
   const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
-  let notesTotal = 0;
-  [1, 5, 10, 20].forEach(v => {
+  let eligibleTotal = 0;
+  NOTE_ALL.forEach(v => {
     const input = document.getElementById("note_" + v);
     const pieces = parseInt(input.value, 10) || 0;
     const sub = pieces * v;
-    notesTotal += sub;
     const cell = document.getElementById("subnote_" + v);
     cell.textContent = fmt(sub);
     cell.classList.toggle("nonzero", sub > 0);
+    if (NOTE_ELIGIBLE.includes(v)) eligibleTotal += sub;
   });
-  document.getElementById("notesTotal").textContent = fmt(notesTotal);
+  document.getElementById("notesTotal").textContent = fmt(eligibleTotal);
 
-  const grand = coinsTotal + notesTotal;
+  const grand = coinsTotal + eligibleTotal;
   document.getElementById("floatGrandTotal").textContent = fmt(grand);
 
   const remaining = 200 - grand;
   const remEl = document.getElementById("remainingToTarget");
   const remRow = document.getElementById("remainingRow");
   remEl.textContent = fmt(Math.abs(remaining)) + (remaining < 0 ? " over" : remaining === 0 ? " — target reached" : "");
-  remRow.className = "infoRow " + (remaining === 0 ? "good" : remaining > 0 ? "warn" : "warn");
+  remRow.className = "infoRow " + (remaining === 0 ? "good" : "warn");
 }
 
 function confirmNotes() {
   updateFloatTotals();
-  const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
-  let notesTotal = 0;
-  [1, 5, 10, 20].forEach(v => {
-    notesTotal += (parseInt(document.getElementById("note_" + v).value, 10) || 0) * v;
+
+  NOTE_SWEEP.forEach(d => {
+    const input = document.getElementById("note_" + d);
+    const val = parseInt(input.value, 10) || 0;
+    if (val > 0) {
+      movedNotes[d] = (movedNotes[d] || 0) + val;
+      input.value = 0;
+    }
   });
-  const total = Math.round(coinsTotal + notesTotal);
+  renderMovedNotes();
+  updateFloatTotals();
+
+  const coinsTotal = COIN_DENOMS.reduce((sum, d) => sum + coinPieces()[d] * d, 0);
+  let eligibleTotal = 0;
+  NOTE_ELIGIBLE.forEach(v => { eligibleTotal += (parseInt(document.getElementById("note_" + v).value, 10) || 0) * v; });
+  const total = Math.round(coinsTotal + eligibleTotal);
   const excess = total - 200;
 
-  if (excess === 0) {
-    lockConfirmedNotes();
-    saveState();
-    return;
-  }
+  if (excess === 0) { lockConfirmedNotes(); saveState(); return; }
 
   if (excess < 0) {
     const shortfall = Math.abs(excess);
@@ -761,10 +469,8 @@ function confirmNotes() {
   }
 
   const noteCounts = {};
-  [1, 5, 10, 20].forEach(v => {
-    noteCounts[v] = parseInt(document.getElementById("note_" + v).value, 10) || 0;
-  });
-  currentNoteCombos = findCombos(excess, noteCounts, [20, 10, 5, 1]);
+  NOTE_ELIGIBLE.forEach(v => { noteCounts[v] = parseInt(document.getElementById("note_" + v).value, 10) || 0; });
+  currentNoteCombos = findCombos(excess, noteCounts, [10, 5, 1]);
   selectedNoteComboIndex = currentNoteCombos.length ? 0 : -1;
   renderNoteCombos(excess);
 }
@@ -773,49 +479,37 @@ function renderNoteCombos(excess) {
   document.getElementById("noteExcessLabel").textContent = fmt(excess);
   const list = document.getElementById("noteComboList");
   list.innerHTML = "";
-
   if (currentNoteCombos.length === 0) {
     list.innerHTML = '<p class="muted">Not enough notes counted to trim exactly ' + fmt(excess) + '. Adjust the counts.</p>';
     document.getElementById("noteComboBox").classList.add("show");
     return;
   }
-
   currentNoteCombos.forEach((combo, i) => {
     let noteCount = 0;
     const chips = [];
-    [20, 10, 5, 1].forEach(v => {
-      if (combo[v]) {
-        noteCount += combo[v];
-        chips.push('<span class="chip chip-note-' + v + '">RM' + v + '<span class="count">x' + combo[v] + '</span></span>');
-      }
+    [10, 5, 1].forEach(v => {
+      if (combo[v]) { noteCount += combo[v]; chips.push('<span class="chip chip-note-' + v + '">RM' + v + '<span class="count">x' + combo[v] + '</span></span>'); }
     });
     const div = document.createElement("div");
     div.className = "comboOption" + (i === selectedNoteComboIndex ? " selected" : "");
     div.innerHTML = '<span class="chips">' + chips.join("") + '</span><span class="coinCount">' + noteCount + ' notes</span>';
-    div.onclick = () => {
-      selectedNoteComboIndex = i;
-      renderNoteCombos(excess);
-    };
+    div.onclick = () => { selectedNoteComboIndex = i; renderNoteCombos(excess); };
     list.appendChild(div);
   });
-
   document.getElementById("noteComboBox").classList.add("show");
 }
 
 function confirmNoteComboSelection() {
   if (selectedNoteComboIndex < 0 || !currentNoteCombos[selectedNoteComboIndex]) return;
   const combo = currentNoteCombos[selectedNoteComboIndex];
-
-  [20, 10, 5, 1].forEach(v => {
+  [10, 5, 1].forEach(v => {
     const use = combo[v] || 0;
     if (use > 0) {
       const input = document.getElementById("note_" + v);
-      const current = parseInt(input.value, 10) || 0;
-      input.value = Math.max(0, current - use);
+      input.value = Math.max(0, (parseInt(input.value, 10) || 0) - use);
       movedNotes[v] = (movedNotes[v] || 0) + use;
     }
   });
-
   updateFloatTotals();
   document.getElementById("noteComboBox").classList.remove("show");
   renderMovedNotes();
@@ -823,60 +517,192 @@ function confirmNoteComboSelection() {
   saveState();
 }
 
-// ---------- SALE ----------
+// ---------- minimum piece check ----------
+function checkFloatMinimums() {
+  const box = document.getElementById("minWarningBox");
+  const lines = [];
+  Object.keys(FLOAT_MIN).map(Number).sort((a, b) => b - a).forEach(v => {
+    const pcs = parseInt(document.getElementById("note_" + v).value, 10) || 0;
+    const min = FLOAT_MIN[v];
+    if (pcs < min) {
+      lines.push('<div class="line"><span class="short">RM' + v + ': ' + pcs + '/' + min + ' pcs — short by ' + (min - pcs) + '</span></div>');
+    } else if (pcs > min * 2) {
+      lines.push('<div class="line"><span class="surplus">RM' + v + ': ' + pcs + ' pcs — well above the ' + min + ' minimum, consider exchanging some</span></div>');
+    }
+  });
+  if (lines.length === 0) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+  } else {
+    box.innerHTML = '<div class="line" style="font-weight:bold;color:#b35c00;">Denomination check</div>' + lines.join("");
+    box.classList.remove("hidden");
+  }
+}
+
+// ---------- SALE (derived) ----------
 function renderMovedCoins() {
   COIN_DENOMS.forEach(d => {
     const dCents = toCents(d);
     const pcs = movedCoins[d] || 0;
     document.getElementById("salecoin_" + dCents).value = pcs;
-    document.getElementById("subsalecoin_" + dCents).textContent = fmt(pcs * d);
+    const cell = document.getElementById("subsalecoin_" + dCents);
+    cell.textContent = fmt(pcs * d);
+    cell.classList.toggle("nonzero", pcs > 0);
   });
   updateSalesTotals();
 }
 
 function renderMovedNotes() {
-  [20, 10, 5, 1].forEach(v => {
+  NOTE_ALL.forEach(v => {
     const pcs = movedNotes[v] || 0;
     document.getElementById("salemovednote_" + v).value = pcs;
-    document.getElementById("subsalemovednote_" + v).textContent = fmt(pcs * v);
+    const cell = document.getElementById("subsalemovednote_" + v);
+    cell.textContent = fmt(pcs * v);
+    cell.classList.toggle("nonzero", pcs > 0);
   });
   updateSalesTotals();
 }
 
 function updateSalesTotals() {
   const coinsMovedTotal = COIN_DENOMS.reduce((sum, d) => sum + (movedCoins[d] || 0) * d, 0);
-  const notesMovedTotal = [1, 5, 10, 20].reduce((sum, v) => sum + (movedNotes[v] || 0) * v, 0);
-  let notesTotal = 0;
-  [1, 5, 10, 20, 50, 100].forEach(v => {
-    const input = document.getElementById("salenote_" + v);
-    const pieces = parseInt(input.value, 10) || 0;
-    const sub = pieces * v;
-    notesTotal += sub;
-    const cell = document.getElementById("subsalenote_" + v);
-    cell.textContent = fmt(sub);
-    cell.classList.toggle("nonzero", sub > 0);
-  });
-  document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesMovedTotal + notesTotal);
+  const notesMovedTotal = NOTE_ALL.reduce((sum, v) => sum + (movedNotes[v] || 0) * v, 0);
+  document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesMovedTotal);
 }
 
-document.querySelectorAll(".saleNoteInput").forEach(inp => {
-  inp.addEventListener("input", updateSalesTotals);
+// ---------- EXCHANGE WITH SV ----------
+document.querySelectorAll(".exchangeTargetBtn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    exchangeTarget = parseInt(btn.dataset.target, 10);
+    document.querySelectorAll(".exchangeTargetBtn").forEach(b => b.classList.toggle("active", b === btn));
+    selectedExchangeComboIndex = -1;
+    exchangeBatchValue = null;
+    document.getElementById("exchangeComboArea").innerHTML = "";
+
+    const batchArea = document.getElementById("exchangeBatchArea");
+    const batchButtons = document.getElementById("exchangeBatchButtons");
+    batchButtons.innerHTML = "";
+
+    if (exchangeTarget === 10) {
+      exchangeBatchValue = 100;
+      batchArea.classList.add("hidden");
+      renderExchangeCombos();
+    } else {
+      batchArea.classList.remove("hidden");
+      [20, 50].forEach(b => {
+        const bBtn = document.createElement("button");
+        bBtn.type = "button";
+        bBtn.className = "secondary small";
+        bBtn.textContent = "RM" + b;
+        bBtn.onclick = () => {
+          exchangeBatchValue = b;
+          batchButtons.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+          bBtn.classList.add("active");
+          renderExchangeCombos();
+        };
+        batchButtons.appendChild(bBtn);
+      });
+    }
+  });
 });
+
+function renderExchangeCombos() {
+  const area = document.getElementById("exchangeComboArea");
+  if (!exchangeTarget || !exchangeBatchValue) { area.innerHTML = ""; return; }
+
+  const giveDenoms = NOTE_ELIGIBLE.filter(v => v !== exchangeTarget);
+  const available = {};
+  giveDenoms.forEach(v => {
+    const pcs = parseInt(document.getElementById("note_" + v).value, 10) || 0;
+    const min = FLOAT_MIN[v] || 0;
+    available[v] = Math.max(0, pcs - min);
+  });
+
+  currentExchangeCombos = findCombos(exchangeBatchValue, available, giveDenoms);
+  selectedExchangeComboIndex = currentExchangeCombos.length ? 0 : -1;
+  drawExchangeCombos(giveDenoms);
+}
+
+function drawExchangeCombos(giveDenoms) {
+  const area = document.getElementById("exchangeComboArea");
+  const receivePieces = exchangeBatchValue / exchangeTarget;
+
+  if (currentExchangeCombos.length === 0) {
+    area.innerHTML = '<p class="muted" style="margin-top:10px;">Not enough surplus (above the float minimum) to give RM' + exchangeBatchValue + ' worth without dropping another denom below its minimum.</p>';
+    return;
+  }
+
+  let html = '<p class="sub" style="margin-top:14px;">Give RM' + exchangeBatchValue + ' worth, receive ' + receivePieces + ' x RM' + exchangeTarget + '</p><div id="exchangeComboList"></div><button id="confirmExchangeBtn">Confirm exchange</button>';
+  area.innerHTML = html;
+  const list = document.getElementById("exchangeComboList");
+
+  currentExchangeCombos.forEach((combo, i) => {
+    let count = 0;
+    const chips = [];
+    giveDenoms.forEach(v => {
+      if (combo[v]) { count += combo[v]; chips.push('<span class="chip chip-note-' + v + '">RM' + v + '<span class="count">x' + combo[v] + '</span></span>'); }
+    });
+    const div = document.createElement("div");
+    div.className = "comboOption" + (i === selectedExchangeComboIndex ? " selected" : "");
+    div.innerHTML = '<span class="chips">' + chips.join("") + '</span><span class="coinCount">' + count + ' notes</span>';
+    div.onclick = () => { selectedExchangeComboIndex = i; drawExchangeCombos(giveDenoms); };
+    list.appendChild(div);
+  });
+
+  document.getElementById("confirmExchangeBtn").onclick = () => confirmExchange(giveDenoms);
+}
+
+function confirmExchange(giveDenoms) {
+  if (selectedExchangeComboIndex < 0 || !currentExchangeCombos[selectedExchangeComboIndex]) return;
+  const combo = currentExchangeCombos[selectedExchangeComboIndex];
+
+  giveDenoms.forEach(v => {
+    const use = combo[v] || 0;
+    if (use > 0) {
+      const input = document.getElementById("note_" + v);
+      input.value = Math.max(0, (parseInt(input.value, 10) || 0) - use);
+    }
+  });
+
+  const receivePieces = exchangeBatchValue / exchangeTarget;
+  const targetInput = document.getElementById("note_" + exchangeTarget);
+  targetInput.value = (parseInt(targetInput.value, 10) || 0) + receivePieces;
+
+  updateFloatTotals();
+  checkFloatMinimums();
+  refreshAllRowHighlights();
+  saveState();
+
+  document.getElementById("exchangeComboArea").innerHTML = '<p class="muted" style="margin-top:10px;">Exchange complete.</p>';
+  document.querySelectorAll(".exchangeTargetBtn").forEach(b => b.classList.remove("active"));
+  document.getElementById("exchangeBatchArea").classList.add("hidden");
+  exchangeTarget = null;
+  exchangeBatchValue = null;
+}
 
 // ---------- reset ----------
 function resetAll() {
   const confirmed = confirm("Reset all counts? This will clear everything you've entered.");
   if (!confirmed) return;
 
-  document.querySelectorAll(".coinInput, .noteInput, .saleNoteInput").forEach(inp => inp.value = 0);
+  document.querySelectorAll(".coinInput, .noteInput").forEach(inp => inp.value = 0);
   movedCoins = {};
   movedNotes = {};
   currentCombos = [];
   currentNoteCombos = [];
+  currentExchangeCombos = [];
   selectedComboIndex = -1;
   selectedNoteComboIndex = -1;
+  selectedExchangeComboIndex = -1;
+  exchangeTarget = null;
+  exchangeBatchValue = null;
+
   document.getElementById("comboBox").classList.remove("show");
   document.getElementById("noteComboBox").classList.remove("show");
+  document.getElementById("minWarningBox").classList.add("hidden");
+  document.getElementById("exchangeComboArea").innerHTML = "";
+  document.getElementById("exchangeBatchArea").classList.add("hidden");
+  document.querySelectorAll(".exchangeTargetBtn").forEach(b => b.classList.remove("active"));
+
   lockNotesSection();
   unlockCoinsSection();
   updateCoinSubtotals();
@@ -886,40 +712,25 @@ function resetAll() {
   clearSavedState();
 }
 
-// ---------- focus behavior: select existing value so typing replaces it ----------
+// ---------- focus behavior ----------
 document.querySelectorAll('input[type=number]').forEach(inp => {
-  inp.addEventListener('focus', function () {
-    this.select();
-  });
+  inp.addEventListener('focus', function () { this.select(); });
 });
 
 // ---------- SPEED FEATURES ----------
-
-// 1. +/- stepper buttons on every editable number field
 function initSteppers() {
   document.querySelectorAll('input[type=number]').forEach(inp => {
-    if (inp.classList.contains('saleCoinInput') || inp.classList.contains('saleMovedNoteInput')) return; // read-only, no steppers
+    if (inp.classList.contains('saleCoinInput') || inp.classList.contains('saleMovedNoteInput')) return;
     if (inp.dataset.stepperInit) return;
     inp.dataset.stepperInit = "1";
-
     const wrap = document.createElement('div');
     wrap.className = 'stepperWrap';
-
     const minusBtn = document.createElement('button');
-    minusBtn.type = 'button';
-    minusBtn.className = 'stepBtn';
-    minusBtn.textContent = '\u2212';
-
+    minusBtn.type = 'button'; minusBtn.className = 'stepBtn'; minusBtn.textContent = '\u2212';
     const plusBtn = document.createElement('button');
-    plusBtn.type = 'button';
-    plusBtn.className = 'stepBtn';
-    plusBtn.textContent = '+';
-
+    plusBtn.type = 'button'; plusBtn.className = 'stepBtn'; plusBtn.textContent = '+';
     inp.parentNode.insertBefore(wrap, inp);
-    wrap.appendChild(minusBtn);
-    wrap.appendChild(inp);
-    wrap.appendChild(plusBtn);
-
+    wrap.appendChild(minusBtn); wrap.appendChild(inp); wrap.appendChild(plusBtn);
     function bump(delta) {
       if (inp.disabled) return;
       const current = parseInt(inp.value, 10) || 0;
@@ -931,7 +742,6 @@ function initSteppers() {
   });
 }
 
-// 2. Enter key jumps to the next editable field instead of needing a tap
 function initEnterNav() {
   const inputs = Array.from(document.querySelectorAll('input[type=number]'));
   inputs.forEach((inp, idx) => {
@@ -939,181 +749,114 @@ function initEnterNav() {
       if (e.key !== 'Enter') return;
       e.preventDefault();
       for (let i = idx + 1; i < inputs.length; i++) {
-        if (!inputs[i].disabled) {
-          inputs[i].focus();
-          inputs[i].select();
-          return;
-        }
+        if (!inputs[i].disabled) { inputs[i].focus(); inputs[i].select(); return; }
       }
       inp.blur();
     });
   });
 }
 
-// 3. Auto-focus the first editable field so typing can start immediately
 function autoFocusFirst() {
   const first = document.querySelector('input[type=number]:not([disabled])');
   if (first) first.focus();
 }
 
-// 4. Highlight rows that already have a count, and bold non-zero subtotals
 function refreshRowHighlight(inp) {
   const tr = inp.closest('tr');
-  if (tr) {
-    const val = parseFloat(inp.value) || 0;
-    tr.classList.toggle('filledRow', val > 0);
-  }
+  if (tr) { const val = parseFloat(inp.value) || 0; tr.classList.toggle('filledRow', val > 0); }
 }
-function refreshAllRowHighlights() {
-  document.querySelectorAll('input[type=number]').forEach(refreshRowHighlight);
-}
+function refreshAllRowHighlights() { document.querySelectorAll('input[type=number]').forEach(refreshRowHighlight); }
 function initRowHighlighting() {
-  document.querySelectorAll('input[type=number]').forEach(inp => {
-    inp.addEventListener('input', () => refreshRowHighlight(inp));
-  });
+  document.querySelectorAll('input[type=number]').forEach(inp => inp.addEventListener('input', () => refreshRowHighlight(inp)));
   refreshAllRowHighlights();
 }
 
-// 5. Copy a plain-text summary of Float + Sale to the clipboard
 function buildSummaryText() {
   const lines = [];
-
   lines.push("FLOAT");
   lines.push("Notes:");
-  [20, 10, 5, 1].forEach(v => {
+  NOTE_ALL.forEach(v => {
     const val = parseInt(document.getElementById('note_' + v).value, 10) || 0;
     lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
   });
   lines.push("Coins:");
-  [0.50, 0.20, 0.10, 0.05].forEach(d => {
+  COIN_DENOMS.slice().reverse().forEach(d => {
     const val = parseInt(document.getElementById('coin_' + toCents(d)).value, 10) || 0;
     lines.push('RM' + d.toFixed(2) + ' x ' + val + ' = ' + fmt(val * d));
   });
   lines.push('Float total: ' + document.getElementById('floatGrandTotal').textContent);
   lines.push('');
-
   lines.push("SALE");
-  lines.push("Notes:");
-  [100, 50, 20, 10, 5, 1].forEach(v => {
-    const val = parseInt(document.getElementById('salenote_' + v).value, 10) || 0;
-    lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
-  });
   lines.push("Notes moved from float:");
-  [20, 10, 5, 1].forEach(v => {
+  NOTE_ALL.forEach(v => {
     const pcs = movedNotes[v] || 0;
     lines.push('RM' + v + ' x ' + pcs + ' = ' + fmt(pcs * v));
   });
   lines.push("Coins moved from float:");
-  [0.50, 0.20, 0.10, 0.05].forEach(d => {
+  COIN_DENOMS.slice().reverse().forEach(d => {
     const pcs = movedCoins[d] || 0;
     lines.push('RM' + d.toFixed(2) + ' x ' + pcs + ' = ' + fmt(pcs * d));
   });
   lines.push('Sales total: ' + document.getElementById('salesGrandTotal').textContent);
-
   return lines.join('\n');
 }
 
 function fallbackCopy(text, cb) {
   const ta = document.createElement('textarea');
-  ta.value = text;
-  ta.style.position = 'fixed';
-  ta.style.opacity = '0';
-  document.body.appendChild(ta);
-  ta.focus();
-  ta.select();
-  try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try { document.execCommand('copy'); } catch (e) {}
   document.body.removeChild(ta);
   if (cb) cb();
 }
-
 function copySummary() {
   const text = buildSummaryText();
   const btn = document.getElementById('copySummaryBtn');
   const original = btn.textContent;
-  function showCopied() {
-    btn.textContent = 'Copied!';
-    setTimeout(() => { btn.textContent = original; }, 1500);
-  }
+  function showCopied() { btn.textContent = 'Copied!'; setTimeout(() => { btn.textContent = original; }, 1500); }
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
-  } else {
-    fallbackCopy(text, showCopied);
-  }
+  } else { fallbackCopy(text, showCopied); }
 }
 
-// ---------- persistence (saved locally on this device/browser only) ----------
-const STORAGE_KEY = "cashier_system_state_v1";
+// ---------- persistence ----------
+const STORAGE_KEY = "cashier_system_state_v2";
 
 function saveState() {
-  const state = {
-    coins: {},
-    notes: {},
-    saleNotes: {},
-    movedCoins,
-    movedNotes,
+  const state = { coins: {}, notes: {}, movedCoins, movedNotes,
     coinsLocked: document.getElementById("coinsSection").classList.contains("lockedSection"),
-    notesConfirmed: !document.getElementById("editNotesBtn").classList.contains("hidden")
-  };
-  COIN_DENOMS.forEach(d => {
-    state.coins[toCents(d)] = document.getElementById("coin_" + toCents(d)).value;
-  });
-  [1, 5, 10, 20].forEach(v => {
-    state.notes[v] = document.getElementById("note_" + v).value;
-  });
-  [1, 5, 10, 20, 50, 100].forEach(v => {
-    state.saleNotes[v] = document.getElementById("salenote_" + v).value;
-  });
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch (e) { /* storage unavailable, ignore */ }
+    notesConfirmed: !document.getElementById("editNotesBtn").classList.contains("hidden") };
+  COIN_DENOMS.forEach(d => { state.coins[toCents(d)] = document.getElementById("coin_" + toCents(d)).value; });
+  NOTE_ALL.forEach(v => { state.notes[v] = document.getElementById("note_" + v).value; });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
 }
 
 function loadState() {
   let raw;
-  try {
-    raw = localStorage.getItem(STORAGE_KEY);
-  } catch (e) { return; }
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (e) { return; }
   if (!raw) return;
-
   let state;
-  try {
-    state = JSON.parse(raw);
-  } catch (e) { return; }
+  try { state = JSON.parse(raw); } catch (e) { return; }
 
   COIN_DENOMS.forEach(d => {
     const v = state.coins && state.coins[toCents(d)];
     if (v !== undefined) document.getElementById("coin_" + toCents(d)).value = v;
   });
-  [1, 5, 10, 20].forEach(v => {
+  NOTE_ALL.forEach(v => {
     const val = state.notes && state.notes[v];
     if (val !== undefined) document.getElementById("note_" + v).value = val;
   });
-  [1, 5, 10, 20, 50, 100].forEach(v => {
-    const val = state.saleNotes && state.saleNotes[v];
-    if (val !== undefined) document.getElementById("salenote_" + v).value = val;
-  });
-  if (state.movedCoins) {
-    movedCoins = {};
-    Object.keys(state.movedCoins).forEach(k => movedCoins[k] = state.movedCoins[k]);
-  }
-  if (state.movedNotes) {
-    movedNotes = {};
-    Object.keys(state.movedNotes).forEach(k => movedNotes[k] = state.movedNotes[k]);
-  }
+  if (state.movedCoins) { movedCoins = {}; Object.keys(state.movedCoins).forEach(k => movedCoins[k] = state.movedCoins[k]); }
+  if (state.movedNotes) { movedNotes = {}; Object.keys(state.movedNotes).forEach(k => movedNotes[k] = state.movedNotes[k]); }
+
   if (state.coinsLocked) {
     lockCoinsSection();
     revealNotesSection();
-    if (state.notesConfirmed) {
-      lockConfirmedNotes();
-    }
+    if (state.notesConfirmed) lockConfirmedNotes();
   }
 }
 
-function clearSavedState() {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (e) { /* ignore */ }
-}
+function clearSavedState() { try { localStorage.removeItem(STORAGE_KEY); } catch (e) {} }
 
 // ---------- init ----------
 loadState();
@@ -1121,16 +864,12 @@ updateCoinSubtotals();
 renderMovedCoins();
 renderMovedNotes();
 updateFloatTotals();
-updateSalesTotals();
 initSteppers();
 initEnterNav();
 initRowHighlighting();
 setTimeout(autoFocusFirst, 50);
 
-// save on every input change (covers coin/note/saleNote inputs)
-document.querySelectorAll('input[type=number]').forEach(inp => {
-  inp.addEventListener('input', saveState);
-});
+document.querySelectorAll('input[type=number]').forEach(inp => inp.addEventListener('input', saveState));
 </script>
 </body>
 </html>
