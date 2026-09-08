@@ -601,9 +601,18 @@ document.querySelectorAll(".exchangeTargetBtn").forEach(btn => {
     batchButtons.innerHTML = "";
 
     if (exchangeTarget === 10) {
-      exchangeBatchValue = 100;
-      batchArea.classList.add("hidden");
-      renderExchangeCombos();
+      batchArea.classList.remove("hidden");
+      const bBtn = document.createElement("button");
+      bBtn.type = "button";
+      bBtn.className = "secondary small";
+      bBtn.textContent = "RM100";
+      bBtn.onclick = () => {
+        exchangeBatchValue = 100;
+        batchButtons.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+        bBtn.classList.add("active");
+        renderExchangeCombos();
+      };
+      batchButtons.appendChild(bBtn);
     } else {
       batchArea.classList.remove("hidden");
       [20, 50].forEach(b => {
