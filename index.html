@@ -196,6 +196,42 @@
     pointer-events: none;
   }
   .lockNotice.hidden { display: none; }
+  .stepperWrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stepBtn {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    padding: 0;
+    margin: 0;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1;
+    background: #eef1f5;
+    color: #333;
+    border: 1px solid #ccc;
+    flex-shrink: 0;
+  }
+  .stepBtn:hover { background: #e2e6ec; }
+  .stepperWrap input[type=number] {
+    flex: 1;
+    min-width: 0;
+    max-width: none;
+    text-align: center;
+  }
+  tr.filledRow { background: #f1fbf5; }
+  .subtotal {
+    font-weight: 600;
+    font-size: 14px !important;
+    color: #222;
+  }
+  .subtotal.nonzero { color: #1a7f37; }
+  @media (max-width: 380px) {
+    .stepBtn { width: 26px; height: 26px; min-width: 26px; font-size: 14px; }
+  }
 </style>
 </head>
 <body>
@@ -353,6 +389,7 @@
   </div>
 
   <button class="secondary" onclick="resetAll()">Reset all</button>
+  <button class="secondary" id="copySummaryBtn" onclick="copySummary()">Copy summary</button>
 </div>
 
 <script>
@@ -387,7 +424,9 @@ function updateCoinSubtotals() {
   COIN_DENOMS.forEach(d => {
     const sub = pieces[d] * d;
     total += sub;
-    document.getElementById("sub_" + toCents(d)).textContent = fmt(sub);
+    const cell = document.getElementById("sub_" + toCents(d));
+    cell.textContent = fmt(sub);
+    cell.classList.toggle("nonzero", sub > 0);
   });
   document.getElementById("coinsTotal").textContent = fmt(total);
   document.getElementById("comboBox").classList.remove("show");
@@ -535,7 +574,9 @@ function updateFloatTotals() {
     const pieces = parseInt(input.value, 10) || 0;
     const sub = pieces * v;
     notesTotal += sub;
-    document.getElementById("subnote_" + v).textContent = fmt(sub);
+    const cell = document.getElementById("subnote_" + v);
+    cell.textContent = fmt(sub);
+    cell.classList.toggle("nonzero", sub > 0);
   });
   document.getElementById("notesTotal").textContent = fmt(notesTotal);
 
@@ -572,7 +613,9 @@ function updateSalesTotals() {
     const pieces = parseInt(input.value, 10) || 0;
     const sub = pieces * v;
     notesTotal += sub;
-    document.getElementById("subsalenote_" + v).textContent = fmt(sub);
+    const cell = document.getElementById("subsalenote_" + v);
+    cell.textContent = fmt(sub);
+    cell.classList.toggle("nonzero", sub > 0);
   });
   document.getElementById("salesGrandTotal").textContent = fmt(coinsMovedTotal + notesTotal);
 }
@@ -603,6 +646,142 @@ document.querySelectorAll('input[type=number]').forEach(inp => {
     this.select();
   });
 });
+
+// ---------- SPEED FEATURES ----------
+
+// 1. +/- stepper buttons on every editable number field
+function initSteppers() {
+  document.querySelectorAll('input[type=number]').forEach(inp => {
+    if (inp.classList.contains('saleCoinInput')) return; // read-only, no steppers
+    if (inp.dataset.stepperInit) return;
+    inp.dataset.stepperInit = "1";
+
+    const wrap = document.createElement('div');
+    wrap.className = 'stepperWrap';
+
+    const minusBtn = document.createElement('button');
+    minusBtn.type = 'button';
+    minusBtn.className = 'stepBtn';
+    minusBtn.textContent = '\u2212';
+
+    const plusBtn = document.createElement('button');
+    plusBtn.type = 'button';
+    plusBtn.className = 'stepBtn';
+    plusBtn.textContent = '+';
+
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(minusBtn);
+    wrap.appendChild(inp);
+    wrap.appendChild(plusBtn);
+
+    function bump(delta) {
+      if (inp.disabled) return;
+      const current = parseInt(inp.value, 10) || 0;
+      inp.value = Math.max(0, current + delta);
+      inp.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    minusBtn.addEventListener('click', () => bump(-1));
+    plusBtn.addEventListener('click', () => bump(1));
+  });
+}
+
+// 2. Enter key jumps to the next editable field instead of needing a tap
+function initEnterNav() {
+  const inputs = Array.from(document.querySelectorAll('input[type=number]'));
+  inputs.forEach((inp, idx) => {
+    inp.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      e.preventDefault();
+      for (let i = idx + 1; i < inputs.length; i++) {
+        if (!inputs[i].disabled) {
+          inputs[i].focus();
+          inputs[i].select();
+          return;
+        }
+      }
+      inp.blur();
+    });
+  });
+}
+
+// 3. Auto-focus the first editable field so typing can start immediately
+function autoFocusFirst() {
+  const first = document.querySelector('input[type=number]:not([disabled])');
+  if (first) first.focus();
+}
+
+// 4. Highlight rows that already have a count, and bold non-zero subtotals
+function refreshRowHighlight(inp) {
+  const tr = inp.closest('tr');
+  if (tr) {
+    const val = parseFloat(inp.value) || 0;
+    tr.classList.toggle('filledRow', val > 0);
+  }
+}
+function refreshAllRowHighlights() {
+  document.querySelectorAll('input[type=number]').forEach(refreshRowHighlight);
+}
+function initRowHighlighting() {
+  document.querySelectorAll('input[type=number]').forEach(inp => {
+    inp.addEventListener('input', () => refreshRowHighlight(inp));
+  });
+  refreshAllRowHighlights();
+}
+
+// 5. Copy a plain-text summary of Float + Sale to the clipboard
+function buildSummaryText() {
+  const lines = [];
+  lines.push("FLOAT");
+  [20, 10, 5, 1].forEach(v => {
+    const val = parseInt(document.getElementById('note_' + v).value, 10) || 0;
+    if (val > 0) lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
+  });
+  [0.50, 0.20, 0.10, 0.05].forEach(d => {
+    const val = parseInt(document.getElementById('coin_' + toCents(d)).value, 10) || 0;
+    if (val > 0) lines.push('RM' + d.toFixed(2) + ' x ' + val + ' = ' + fmt(val * d));
+  });
+  lines.push('Float total: ' + document.getElementById('floatGrandTotal').textContent);
+  lines.push('');
+  lines.push('SALE');
+  [100, 50, 20, 10, 5, 1].forEach(v => {
+    const val = parseInt(document.getElementById('salenote_' + v).value, 10) || 0;
+    if (val > 0) lines.push('RM' + v + ' x ' + val + ' = ' + fmt(val * v));
+  });
+  [0.50, 0.20, 0.10, 0.05].forEach(d => {
+    const pcs = movedCoins[d] || 0;
+    if (pcs > 0) lines.push('RM' + d.toFixed(2) + ' x ' + pcs + ' = ' + fmt(pcs * d) + ' (from float)');
+  });
+  lines.push('Sales total: ' + document.getElementById('salesGrandTotal').textContent);
+  return lines.join('\n');
+}
+
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+  document.body.removeChild(ta);
+  if (cb) cb();
+}
+
+function copySummary() {
+  const text = buildSummaryText();
+  const btn = document.getElementById('copySummaryBtn');
+  const original = btn.textContent;
+  function showCopied() {
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = original; }, 1500);
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(showCopied).catch(() => fallbackCopy(text, showCopied));
+  } else {
+    fallbackCopy(text, showCopied);
+  }
+}
 
 // ---------- persistence (saved locally on this device/browser only) ----------
 const STORAGE_KEY = "cashier_system_state_v1";
@@ -678,6 +857,10 @@ updateCoinSubtotals();
 renderMovedCoins();
 updateFloatTotals();
 updateSalesTotals();
+initSteppers();
+initEnterNav();
+initRowHighlighting();
+setTimeout(autoFocusFirst, 50);
 
 // save on every input change (covers coin/note/saleNote inputs)
 document.querySelectorAll('input[type=number]').forEach(inp => {
