@@ -215,6 +215,61 @@ function findCombos(targetUnits, availableUnits, denoms) {
   return results;
 }
 
+// ---------- diverse combo finder (varied mixes, not all biased to the biggest note) ----------
+function findDiverseCombos(targetUnits, availableUnits, denoms, limit) {
+  const all = [];
+  const CAP = 5000;
+  function bt(idx, remaining, picked) {
+    if (all.length >= CAP) return;
+    if (remaining === 0) {
+      const c = {};
+      denoms.forEach(d => { c[d] = picked[d] || 0; });
+      all.push(c);
+      return;
+    }
+    if (idx >= denoms.length) return;
+    const d = denoms[idx];
+    const maxUse = Math.min(Math.floor(remaining / d), availableUnits[d] || 0);
+    for (let use = maxUse; use >= 0; use--) {
+      picked[d] = use;
+      bt(idx + 1, remaining - use * d, picked);
+    }
+    delete picked[d];
+  }
+  bt(0, targetUnits, {});
+  if (all.length === 0) return [];
+
+  const count = c => denoms.reduce((s, d) => s + c[d], 0);
+  const key = c => denoms.map(d => c[d]).join("-");
+  const spread = c => {
+    const shares = denoms.map(d => c[d] * d);
+    return Math.max(...shares) - Math.min(...shares);
+  };
+  const picks = [];
+  const seen = new Set();
+  function addBest(scoreFn) {
+    let best = null, bestScore = -Infinity;
+    all.forEach(c => {
+      if (seen.has(key(c))) return;
+      const s = scoreFn(c);
+      if (s > bestScore) { bestScore = s; best = c; }
+    });
+    if (best && bestScore > -Infinity) { picks.push(best); seen.add(key(best)); }
+  }
+
+  addBest(c => -count(c));                                   // fewest notes
+  addBest(c => -spread(c));                                  // most evenly mixed
+  if (denoms.includes(5)) addBest(c => c[5] * 1000 - count(c));   // lots of RM5
+  if (denoms.includes(1)) addBest(c => c[1] * 1000 - count(c));   // lots of RM1
+  if (denoms.includes(10)) addBest(c => c[10] === 0 ? -count(c) : -Infinity);  // no RM10 at all
+  if (denoms.includes(5)) addBest(c => c[5] === 0 ? -count(c) : -Infinity);    // no RM5 at all
+  if (denoms.includes(1)) addBest(c => c[1] === 0 ? -count(c) : -Infinity);    // no RM1 at all
+  const sorted = all.slice().sort((a, b) => count(a) - count(b));
+  addBest(c => -Math.abs(count(c) - count(sorted[Math.floor(sorted.length / 2)])));  // middle-of-the-road
+
+  return picks.slice(0, limit || 8);
+}
+
 // ---------- FLOAT: coins ----------
 function coinPieces() {
   const out = {};
@@ -471,7 +526,7 @@ function confirmNotes() {
 
   const noteCounts = {};
   NOTE_ELIGIBLE.forEach(v => { noteCounts[v] = parseInt(document.getElementById("note_" + v).value, 10) || 0; });
-  currentNoteCombos = findCombos(excess, noteCounts, [10, 5, 1]);
+  currentNoteCombos = findDiverseCombos(excess, noteCounts, [10, 5, 1], 8);
   selectedNoteComboIndex = currentNoteCombos.length ? 0 : -1;
   renderNoteCombos(excess);
 }
